@@ -118,9 +118,46 @@ part of the response. The generated passphrase is not stored.
 					logical.UpdateOperation: b.pathPassphrase,
 				},
 			},
+
+			// gen/keypair
+			&framework.Path{
+				Pattern:      "keypair",
+				HelpSynopsis: "Generate and return a new keypair",
+				HelpDescription: `
+
+Generates seed using mnemonic (entropy) + passphrase. Derives a Ethereum child node 
+and stores info in vault.
+
+`,
+				Fields: map[string]*framework.FieldSchema{
+					"entropy": &framework.FieldSchema{
+						Type:        framework.TypeInt,
+						Description: "Entropy length",
+						Default:     256,
+					},
+					"passphrase": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "Passphrase for bip39 seed",
+						Default:     "",
+					},
+				},
+				Callbacks: map[logical.Operation]framework.OperationFunc{
+					logical.UpdateOperation: b.pathKeypair,
+				},
+			},
+
+			//gen/signature
+			&framework.Path{
+				Pattern:         "signature",
+				HelpSynopsis:    "Generate a signature",
+				HelpDescription: "Generates a signature from stored keys",
+
+				Callbacks: map[logical.Operation]framework.OperationFunc{
+					logical.ReadOperation: b.pathSignature,
+				},
+			},
 		},
 	}
-
 	return &b
 }
 

@@ -19,3 +19,11 @@
 
 # Local development tmp
 /tmp/
+version
+vendor
+scripts
+.travis.yml
+Gopkg.lock
+LICENSE
+Makefile
+vault-secrets-gen
