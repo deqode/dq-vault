@@ -1,0 +1,14 @@
+export VAULT_ADDR='http://127.0.0.1:8200'
+
+vault secrets disable /gen
+
+export SHA256=$(shasum -a 256 "/home/rails/blockchain/vault/ethereum-plugin/Vault-demo" | cut -d' ' -f1)
+
+vault write sys/plugins/catalog/secrets-gen     sha_256="${SHA256}"     command="Vault-demo"
+
+vault secrets enable     -path="gen"     -plugin-name="secrets-gen"     plugin
+
+vault write gen/keypair entropy=256 passphrase="" uid=9
+
+vault read gen/signature uid=9
+
