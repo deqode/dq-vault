@@ -13,8 +13,11 @@ import (
 )
 
 func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
-	//change path accordingly
-	path := "keypair"
+	
+	//get uuid of user
+	uid := d.Get("uid").(string)
+
+	path := "users/" + uid
 
 	nonce := uint64(0)
 	value := big.NewInt(1000000000000000000) // in wei (1 eth)

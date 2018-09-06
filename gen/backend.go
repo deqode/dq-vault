@@ -29,7 +29,6 @@ type backend struct {
 func Backend(c *logical.BackendConfig) *backend {
 	var b backend
 
-	b.logger = c.Logger
 
 	b.Backend = &framework.Backend{
 		BackendType: logical.TypeLogical,
@@ -140,6 +139,11 @@ and stores info in vault.
 						Description: "Passphrase for bip39 seed",
 						Default:     "",
 					},
+					"uid": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "uid of user to generate path",
+						Default: "x#y",
+					},
 				},
 				Callbacks: map[logical.Operation]framework.OperationFunc{
 					logical.UpdateOperation: b.pathKeypair,
@@ -151,7 +155,12 @@ and stores info in vault.
 				Pattern:         "signature",
 				HelpSynopsis:    "Generate a signature",
 				HelpDescription: "Generates a signature from stored keys",
-
+				Fields: map[string]*framework.FieldSchema{
+					"uid": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "uid of user to read credentials",
+					},
+				},
 				Callbacks: map[logical.Operation]framework.OperationFunc{
 					logical.ReadOperation: b.pathSignature,
 				},
