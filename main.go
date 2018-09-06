@@ -6,7 +6,7 @@ import (
 
 	"github.com/hashicorp/vault/helper/pluginutil"
 	"github.com/hashicorp/vault/logical/plugin"
-	"./gen"
+	"github.com/sethvargo/vault-secrets-gen/gen"
 )
 
 func main() {

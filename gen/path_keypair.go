@@ -19,35 +19,38 @@ func (b *backend) pathKeypair(ctx context.Context, req *logical.Request, d *fram
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	// obtain entropy length
+	// obtain entropy length, passphrase, uuid
 	entropyLength := d.Get("entropy").(int)
+	passphrase := d.Get("passphrase").(string)
+	uuid := d.Get("uuid").(string)
 
-	//passphrase := d.Get("passphrase").(string) not used, refer line 43
+	// generated storage path to store user info
+	storagePath := "users/" + uuid
 
-	//get uuid of user
-	uid := d.Get("uid").(string)
+	// TODO: remove current node implementation
+	// and store only desired data
+	derivationPath := "m/44'/60'/0'/0/0"
 
-	//get list of all existing uuids
+	// Obtain all existing UUID's from DB
 	vals, err := req.Storage.List(ctx, "users/")
 	if err != nil {
 		return nil, err
 	}
 
-	//improve this if possible, checks with existing uuids
-	for i:=0; i<len(vals); i++ {
-		if(uid == vals[i]) {
-			return nil, logical.CodedError(http.StatusUnprocessableEntity, "uid already exists")
+	// check if UUID exists
+	for i := 0; i < len(vals); i++ {
+		if uuid == vals[i] {
+			return nil, logical.CodedError(http.StatusUnprocessableEntity, "UUID already exists")
 		}
 	}
 
-	//checks if value is provided or not
-	if uid=="x#y" {
-		return nil, logical.CodedError(http.StatusUnprocessableEntity, "provide an user id") 
+	// Check if user provided UUID or not
+	// TODO: use empty string as default if not provided
+	if uuid == "x#y" {
+		return nil, logical.CodedError(http.StatusUnprocessableEntity, "Provide a valid UUID")
 	}
 
-	storagePath := "users/" + uid
-	derivationPath := "m/44'/60'/0'/0/0"
-
+	// For valid entropy length check
 	if entropyLength < 128 || entropyLength%32 != 0 || entropyLength > 256 {
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, "Invalid bip32 entropy length")
 	}
@@ -57,14 +60,14 @@ func (b *backend) pathKeypair(ctx context.Context, req *logical.Request, d *fram
 	checkError(err, "Error generating entropy")
 
 	// obtain mnemonics from entropy
-	mnemonic, err := bip39.NewMnemonic(entropy /*,passphrase*/) //showing error if passphrase is provided
+	mnemonic, err := bip39.NewMnemonic(entropy)
 	checkError(err, "Error generating mnemonics")
 
 	if !bip39.IsMnemonicValid(mnemonic) {
 		log.Fatalf("Generated mnemonic is not valid")
 	}
 
-	wallet, err := hdwallet.NewFromMnemonic(mnemonic)
+	wallet, err := hdwallet.NewFromMnemonic(mnemonic, passphrase)
 	checkError(err, "Error creating wallet")
 
 	path := hdwallet.MustParseDerivationPath(derivationPath)

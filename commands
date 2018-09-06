@@ -12,3 +12,38 @@ vault write gen/keypair entropy=256 passphrase="" uid=9
 
 vault read gen/signature uid=9
 
+-----------------------------------------------------------------------------------------
+
+POSTGRES --
+  sudo vault server -config=config1.hcl
+  sudo vault server -config=config2.hcl
+
+  vault operator init
+  vault operator unseal
+  vault login
+
+-----------------------------
+
+DEV-PLUGIN --
+  vault server -dev -dev-plugin-dir="/etc/vault/plugins"
+
+  export VAULT_ADDR='http://127.0.0.1:8200'
+
+  vault status
+
+  vault secrets disable /gen
+  export SHA256=$(shasum -a 256 "/home/rails/GO/src/github.com/sethvargo/vault-secrets-gen/vault-secrets-gen" | cut -d' ' -f1)
+
+  vault write sys/plugins/catalog/secrets-gen \
+      sha_256="${SHA256}" \
+      command="vault-secrets-gen"
+
+  vault secrets enable \
+      -path="gen" \
+      -plugin-name="secrets-gen" \
+      plugin
+
+  vault write gen/password length=36 symbols=0
+  vault write gen/echo msg=abc
+  vault write gen/keypair entropy=256 passphrase="" uuid=9
+  vault read gen/signature uuid=9

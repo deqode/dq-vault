@@ -2,6 +2,7 @@ package gen
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -13,12 +14,14 @@ import (
 )
 
 func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
-	
 	//get uuid of user
-	uid := d.Get("uid").(string)
+	uuid := d.Get("uuid").(string)
 
-	path := "users/" + uid
+	// TODO: check if UUID is provided or not
+	// Handle error cases if UUID is wrong
+	path := "users/" + uuid
 
+	// Sample data to create raw transaction
 	nonce := uint64(0)
 	value := big.NewInt(1000000000000000000) // in wei (1 eth)
 	gasLimit := uint64(21000)                // in units
@@ -52,10 +55,15 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 		return nil, err
 	}
 
+	ts := types.Transactions{signedTx}
+
+	// TODO: provide chainId
+	txHex := fmt.Sprintf("%x", ts.GetRlp(0))
+
 	//send signature back to the user
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"signature": signedTx.Hash().Hex(),
+			"signature": txHex,
 		},
 	}, nil
 
