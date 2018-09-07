@@ -1,4 +1,4 @@
-package gen
+package api
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/vault/logical"
-	"github.com/sethvargo/vault-secrets-gen/version"
+	"gitlab.com/arout/Vault/version"
 )
 
 func testBackend(tb testing.TB) (*backend, logical.Storage) {

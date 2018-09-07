@@ -15,9 +15,30 @@ vault read gen/signature uid=9
 -----------------------------------------------------------------------------------------
 
 POSTGRES --
+  sudo -u postgres psql
+
+  create database vault;
+  \c vault;
+
+  CREATE TABLE vault_kv_store (
+    parent_path TEXT COLLATE "C" NOT NULL,
+    path        TEXT COLLATE "C",
+    key         TEXT COLLATE "C",
+    value       BYTEA,
+    CONSTRAINT pkey PRIMARY KEY (path, key)
+  );
+
+  CREATE INDEX parent_path_idx ON vault_kv_store (parent_path);
+
+  \conninfo
+
+
+
   sudo vault server -config=config1.hcl
   sudo vault server -config=config2.hcl
 
+  export VAULT_ADDR='http://127.0.0.1:8200'
+  
   vault operator init
   vault operator unseal
   vault login
@@ -31,19 +52,19 @@ DEV-PLUGIN --
 
   vault status
 
-  vault secrets disable /gen
-  export SHA256=$(shasum -a 256 "/home/rails/GO/src/github.com/sethvargo/vault-secrets-gen/vault-secrets-gen" | cut -d' ' -f1)
+  vault secrets disable /api
+  export SHA256=$(shasum -a 256 "/home/rails/GO/src/gitlab.com/arout/Vault/Vault" | cut -d' ' -f1)
 
-  vault write sys/plugins/catalog/secrets-gen \
+  vault write sys/plugins/catalog/secrets-api \
       sha_256="${SHA256}" \
-      command="vault-secrets-gen"
+      command="Vault"
 
   vault secrets enable \
-      -path="gen" \
-      -plugin-name="secrets-gen" \
+      -path="api" \
+      -plugin-name="secrets-api" \
       plugin
 
-  vault write gen/password length=36 symbols=0
-  vault write gen/echo msg=abc
-  vault write gen/keypair entropy=256 passphrase="" uuid=9
-  vault read gen/signature uuid=9
+  vault write api/password length=36 symbols=0
+  vault write api/echo msg=abc
+  vault write api/keypair entropy=256 passphrase="" uuid=9
+  vault read api/signature uuid=9

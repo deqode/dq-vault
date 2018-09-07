@@ -1,11 +1,11 @@
-package gen
+package api
 
 import (
 	"context"
 
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
-	"github.com/sethvargo/vault-secrets-gen/version"
+	"gitlab.com/arout/Vault/version"
 )
 
 // pathInfo corresponds to READ gen/info.
