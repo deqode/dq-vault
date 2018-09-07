@@ -81,7 +81,7 @@ Registers new user in vault using UUID. Generates mnemonics if not provided and 
 					},
 				},
 				Callbacks: map[logical.Operation]framework.OperationFunc{
-					logical.ReadOperation: b.pathSignature,
+					logical.UpdateOperation: b.pathSignature,
 				},
 			},
 
@@ -97,6 +97,21 @@ get help.
 `,
 				Callbacks: map[logical.Operation]framework.OperationFunc{
 					logical.ReadOperation: b.pathInfo,
+				},
+			},
+
+			// api/read
+			&framework.Path{
+				Pattern:      "read",
+				HelpSynopsis: "Display information about this plugin",
+				HelpDescription: `
+
+Displays information about the plugin, such as the plugin version and where to
+get help.
+
+`,
+				Callbacks: map[logical.Operation]framework.OperationFunc{
+					logical.ReadOperation: b.pathRead,
 				},
 			},
 		},

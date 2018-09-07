@@ -15,25 +15,18 @@ func CreateTransaction(privateKeyHex string) (string, error) {
 	privateKey, err := crypto.HexToECDSA(privateKeyHex)
 	CheckError(err, "")
 
-	//sign the transaction
-	data, err := dummyData()
+	tx := dummyTx()
+
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(big.NewInt(3)), privateKey)
 	CheckError(err, "")
 
-	var tx *types.Transaction
-	err = tx.UnmarshalJSON(data)
-	CheckError(err, "")
-
-	signedTx, err := types.SignTx(tx, types.HomesteadSigner{}, privateKey)
-	CheckError(err, "")
 	ts := types.Transactions{signedTx}
-
-	// TODO: provide chainId
 	txHex := fmt.Sprintf("%x", ts.GetRlp(0))
 
 	return txHex, nil
 }
 
-func dummyData() ([]byte, error) {
+func dummyTx() *types.Transaction {
 	// Sample data to create raw transaction
 	nonce := uint64(0)
 	value := big.NewInt(1000000000000000000) // in wei (1 eth)
@@ -42,5 +35,5 @@ func dummyData() ([]byte, error) {
 	toAddress := common.HexToAddress("0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d")
 
 	var data []byte
-	return types.NewTransaction(nonce, toAddress, value, gasLimit, gasPrice, data).MarshalJSON()
+	return types.NewTransaction(nonce, toAddress, value, gasLimit, gasPrice, data)
 }

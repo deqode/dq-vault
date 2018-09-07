@@ -32,7 +32,8 @@ POSTGRES --
 
   \conninfo
 
-
+--------------------------------------------------
+NON-DEV MODE --
 
   sudo vault server -config=config1.hcl
   sudo vault server -config=config2.hcl
@@ -43,7 +44,40 @@ POSTGRES --
   vault operator unseal
   vault login
 
+vault operator unseal m/CWdPTnjdR02m04si4fTmmdHJWFFAcBZa4m/vWhZVx3
+vault operator unseal yM0dwwDbeUL0iaqtKlmdrB1Gh2n02/epTRu1rh6hDscj
+vault operator unseal /ZVUR+hujS0CuPddGzuRXJg8rDFFZG5N8q4dgHZv5bC9
+
+vault login 556c29b8-6dd5-aeea-64f7-c4e8052d8ec0
+
+  vault secrets disable /api
+  export SHA256=$(shasum -a 256 "/home/rails/GO/src/gitlab.com/arout/Vault/Vault" | cut -d' ' -f1)
+
+  vault write sys/plugins/catalog/secrets-api \
+      sha_256="${SHA256}" \
+      command="Vault"
+
+  vault secrets enable \
+      -path="api" \
+      -plugin-name="secrets-api" \
+      plugin
+
+  vault write api/register uuid=manjeet
+  vault write api/signature uuid=manjeet path="m/44'/60'/0'/0/0"
+
 -----------------------------
+POLICIES --
+  vault policy write admin config/admin.hcl
+
+  vault policy write application config/application.hcl
+
+  vault token create -policy="admin"
+
+  vault token create -policy="application"
+
+  vault token capabilities e912aa6c-3223-48c0-552e-4a0cb1a225a6  api/
+
+------------------------------------------------------------------
 
 DEV-PLUGIN --
   vault server -dev -dev-plugin-dir="/etc/vault/plugins"
@@ -75,10 +109,36 @@ DEV-PLUGIN --
 
 --------------------------------------------------------------------------------------------
 
-Unseal Key 1: De3svNrtKY4OE7lCPj/W3l6hU9o/2AdW3b/ZiPiwJwme
-Unseal Key 2: BwLIVePSimnkmNlZvj9PinIrbkXlmD8pEmaLRFedCWqt
-Unseal Key 3: UXLhcOSOokM6xnNv2IB2FMmeCU4oWEIeH2hRxlsWSljb
-Unseal Key 4: 1bKNU56laQge/fo2tjQ9RiTSF3luAQs6d9e3jew9n4o+
-Unseal Key 5: RLK0B1pp5BlwnHPC7zoMufqxC84olMvAb8BR/t6U22wR
+vault operator unseal YDpE4GutQynmhW+T1bBP0K155/1Zu0M5ATmgsHjtqFgi
+vault operator unseal l1LZ4renY3j9VqE4ojdoo0XUqyE2geXgcc5cdd4J5Z4O
+vault operator unseal m/CWdPTnjdR02m04si4fTmmdHJWFFAcBZa4m/vWhZVx3
+vault operator unseal yM0dwwDbeUL0iaqtKlmdrB1Gh2n02/epTRu1rh6hDscj
+vault operator unseal /ZVUR+hujS0CuPddGzuRXJg8rDFFZG5N8q4dgHZv5bC9
 
-Initial Root Token: ec32c0ea-7dce-fd51-6452-f3f73a7ccc03
+vault login 556c29b8-6dd5-aeea-64f7-c4e8052d8ec0
+
+------------------------------------------------------------------------------
+
+CURL REQUESTS
+
+curl \
+    -H "X-Vault-Token: ec32c0ea-7dce-fd51-6452-f3f73a7ccc03" \
+    -X GET \
+    http://127.0.0.1:8200/v1/api/read
+
+
+curl \
+    -H "X-Vault-Token: ec32c0ea-7dce-fd51-6452-f3f73a7ccc03" \
+    -H "Content-Type: application/json" \
+    -X POST \
+    -d '{"uuid":"manjeet"}' \
+    http://127.0.0.1:8200/v1/api/register
+
+
+curl \
+    -H "X-Vault-Token: ec32c0ea-7dce-fd51-6452-f3f73a7ccc03" \
+    -H "Content-Type: application/json" \
+    -X PUT \
+    -d '{"uuid":"manjeet"}' \
+    -d '{"path": "m/44'/60'/0'/0/0"}' \
+    http://127.0.0.1:8200/v1/api/signature

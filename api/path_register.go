@@ -27,8 +27,6 @@ func (b *backend) pathRegister(ctx context.Context, req *logical.Request, d *fra
 	// generated storage path to store user info
 	storagePath := "users/" + uuid
 
-	test := ""
-
 	// Obtain all existing UUID's from DB
 	vals, err := req.Storage.List(ctx, "users/")
 	if err != nil {
@@ -37,7 +35,6 @@ func (b *backend) pathRegister(ctx context.Context, req *logical.Request, d *fra
 
 	// check if UUID exists
 	for i := 0; i < len(vals); i++ {
-		test += vals[i]
 		if uuid == vals[i] {
 			return nil, logical.CodedError(http.StatusUnprocessableEntity, "Provided UUID already exists")
 		}
@@ -75,7 +72,6 @@ func (b *backend) pathRegister(ctx context.Context, req *logical.Request, d *fra
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"test":       test,
 			"uuid":       uuid,
 			"mnemonic":   mnemonic,
 			"passphrase": passphrase,

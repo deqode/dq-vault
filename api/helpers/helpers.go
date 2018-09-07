@@ -79,7 +79,7 @@ func ValidateUser(ctx context.Context, req *logical.Request, uuid string, deriva
 
 	// Check if user provided derivationPath or not
 	if derivationPath == "" {
-		return errors.New("Provide a valid derivationPath")
+		return errors.New("Provide a valid path")
 	}
 
 	// Obtain all existing UUID's from DB
