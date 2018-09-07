@@ -126,6 +126,11 @@ curl \
     -X GET \
     http://127.0.0.1:8200/v1/api/read
 
+curl \
+    -H "X-Vault-Token: 556c29b8-6dd5-aeea-64f7-c4e8052d8ec0" \
+    -X GET \
+    https://0ae1b214.ngrok.io/v1/api/read
+
 
 curl \
     -H "X-Vault-Token: ec32c0ea-7dce-fd51-6452-f3f73a7ccc03" \
@@ -142,3 +147,11 @@ curl \
     -d '{"uuid":"manjeet"}' \
     -d '{"path": "m/44'/60'/0'/0/0"}' \
     http://127.0.0.1:8200/v1/api/signature
+
+
+
+vault write auth/cert/certs/application \
+    display_name=application \
+    policies=application \
+    certificate=@web-cert.pem \
+    ttl=3600
