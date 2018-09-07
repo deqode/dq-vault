@@ -2,63 +2,41 @@ package api
 
 import (
 	"context"
-	"fmt"
-	"math/big"
-
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
+	"net/http"
 
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
+	"gitlab.com/arout/Vault/api/helpers"
 )
 
 func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
-	//get uuid of user
+	if err := helpers.ValidateFields(req, d); err != nil {
+		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	// obatin data provided
 	uuid := d.Get("uuid").(string)
+	derivationPath := d.Get("path").(string)
 
-	// TODO: check if UUID is provided or not
-	// Handle error cases if UUID is wrong
+	// validate data provided
+	if err := helpers.ValidateUser(ctx, req, uuid, derivationPath); err != nil {
+		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	// path where user data is stored in vault
 	path := "users/" + uuid
-
-	// Sample data to create raw transaction
-	nonce := uint64(0)
-	value := big.NewInt(1000000000000000000) // in wei (1 eth)
-	gasLimit := uint64(21000)                // in units
-	gasPrice := big.NewInt(30000000000)      // in wei (30 gwei)
-	toAddress := common.HexToAddress("0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d")
-
 	entry, err := req.Storage.Get(ctx, path)
+	helpers.CheckError(err, "")
 
-	if err != nil {
-		return nil, err
-	}
+	// create object of the actual struct stored
+	var userInfo helpers.User
+	err = entry.DecodeJSON(&userInfo)
+	helpers.CheckError(err, "")
 
-	var node node // create object of the actual struct stored
+	privateKeyHex := helpers.GenerateKeys(userInfo.Mnemonic, userInfo.Passphrase, derivationPath)
 
-	err = entry.DecodeJSON(&node)
-
-	//generates ecdsa type key
-	privateKey, err := crypto.HexToECDSA(node.PrivateKey)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var data []byte
-	tx := types.NewTransaction(nonce, toAddress, value, gasLimit, gasPrice, data)
-
-	//sign the transaction
-	signedTx, err := types.SignTx(tx, types.HomesteadSigner{}, privateKey)
-
-	if err != nil {
-		return nil, err
-	}
-
-	ts := types.Transactions{signedTx}
-
-	// TODO: provide chainId
-	txHex := fmt.Sprintf("%x", ts.GetRlp(0))
+	txHex, err := helpers.CreateTransaction(privateKeyHex)
+	helpers.CheckError(err, "")
 
 	//send signature back to the user
 	return &logical.Response{
@@ -66,5 +44,4 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 			"signature": txHex,
 		},
 	}, nil
-
 }

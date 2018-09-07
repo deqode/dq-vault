@@ -33,7 +33,59 @@ func Backend(c *logical.BackendConfig) *backend {
 		BackendType: logical.TypeLogical,
 		Help:        backendHelp,
 		Paths: []*framework.Path{
-			// gen/info
+
+			// api/register
+			&framework.Path{
+				Pattern:      "register",
+				HelpSynopsis: "Registers a new user in vault with mnemonic and UUID",
+				HelpDescription: `
+
+Registers new user in vault using UUID. Generates mnemonics if not provided and store it in vault.
+
+`,
+				Fields: map[string]*framework.FieldSchema{
+					"uuid": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "UUID of new user",
+						Default:     "",
+					},
+					"mnemonic": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "Mnemonic for bip39 seed",
+						Default:     "",
+					},
+					"passphrase": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "Passphrase for bip39 seed",
+						Default:     "",
+					},
+				},
+				Callbacks: map[logical.Operation]framework.OperationFunc{
+					logical.UpdateOperation: b.pathRegister,
+				},
+			},
+
+			// api/signature
+			&framework.Path{
+				Pattern:         "signature",
+				HelpSynopsis:    "Generate a signature",
+				HelpDescription: "Generates a signature from stored mnemonic and passphrase using deviation path",
+				Fields: map[string]*framework.FieldSchema{
+					"uuid": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "UUID of user to read credentials",
+					},
+					"path": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "Deviation path to obtain keys",
+					},
+				},
+				Callbacks: map[logical.Operation]framework.OperationFunc{
+					logical.ReadOperation: b.pathSignature,
+				},
+			},
+
+			// api/info
 			&framework.Path{
 				Pattern:      "info",
 				HelpSynopsis: "Display information about this plugin",
@@ -45,123 +97,6 @@ get help.
 `,
 				Callbacks: map[logical.Operation]framework.OperationFunc{
 					logical.ReadOperation: b.pathInfo,
-				},
-			},
-
-			// gen/password
-			&framework.Path{
-				Pattern:      "password",
-				HelpSynopsis: "Generate and return a random password",
-				HelpDescription: `
-
-Generates a high-entropy password with the provided length and requirements,
-returning it as part of the response. The generated password is not stored.
-
-`,
-				Fields: map[string]*framework.FieldSchema{
-					"length": &framework.FieldSchema{
-						Type:        framework.TypeInt,
-						Description: "Number of characters for the password.",
-						Default:     64,
-					},
-					"digits": &framework.FieldSchema{
-						Type:        framework.TypeInt,
-						Description: "Number of digits for the password.",
-						Default:     10,
-					},
-					"symbols": &framework.FieldSchema{
-						Type:        framework.TypeInt,
-						Description: "Number of symbols for the password.",
-						Default:     10,
-					},
-					"allow_uppercase": &framework.FieldSchema{
-						Type:        framework.TypeBool,
-						Description: "Allow uppercase letters in the generated password.",
-						Default:     true,
-					},
-					"allow_repeat": &framework.FieldSchema{
-						Type:        framework.TypeBool,
-						Description: "Allow repeating characters, digits, and symbols in the generated password.",
-						Default:     true,
-					},
-				},
-				Callbacks: map[logical.Operation]framework.OperationFunc{
-					logical.UpdateOperation: b.pathPassword,
-				},
-			},
-
-			// gen/passphrase
-			&framework.Path{
-				Pattern:      "passphrase",
-				HelpSynopsis: "Generate and return a random passphrase",
-				HelpDescription: `
-
-Generates a random passphrase with the provided number of words, returning it as
-part of the response. The generated passphrase is not stored.
-
-`,
-				Fields: map[string]*framework.FieldSchema{
-					"words": &framework.FieldSchema{
-						Type:        framework.TypeInt,
-						Description: "Number of words for the passphrase.",
-						Default:     6,
-					},
-					"separator": &framework.FieldSchema{
-						Type:        framework.TypeString,
-						Description: "Character to separate words in passphrase.",
-						Default:     "-",
-					},
-				},
-				Callbacks: map[logical.Operation]framework.OperationFunc{
-					logical.UpdateOperation: b.pathPassphrase,
-				},
-			},
-
-			// gen/keypair
-			&framework.Path{
-				Pattern:      "keypair",
-				HelpSynopsis: "Generate and return a new keypair",
-				HelpDescription: `
-
-Generates seed using mnemonic (entropy) + passphrase. Derives a Ethereum child node 
-and stores info in vault.
-
-`,
-				Fields: map[string]*framework.FieldSchema{
-					"entropy": &framework.FieldSchema{
-						Type:        framework.TypeInt,
-						Description: "Entropy length",
-						Default:     256,
-					},
-					"passphrase": &framework.FieldSchema{
-						Type:        framework.TypeString,
-						Description: "Passphrase for bip39 seed",
-						Default:     "",
-					},
-					"uuid": &framework.FieldSchema{
-						Type:        framework.TypeString,
-						Description: "UUID of user to store data",
-						Default:     "x#y",
-					},
-				},
-				Callbacks: map[logical.Operation]framework.OperationFunc{
-					logical.UpdateOperation: b.pathKeypair,
-				},
-			},
-
-			//gen/signature
-			&framework.Path{
-				Pattern:         "signature",
-				HelpSynopsis:    "Generate a signature",
-				HelpDescription: "Generates a signature from stored keys",
-				Fields: map[string]*framework.FieldSchema{
-					"uuid": &framework.FieldSchema{
-						Type:        framework.TypeString,
-						Description: "UUID of user to read credentials",
-					},
-				},
-				Callbacks: map[logical.Operation]framework.OperationFunc{
-					logical.ReadOperation: b.pathSignature,
 				},
 			},
 		},

@@ -38,7 +38,7 @@ POSTGRES --
   sudo vault server -config=config2.hcl
 
   export VAULT_ADDR='http://127.0.0.1:8200'
-  
+
   vault operator init
   vault operator unseal
   vault login
@@ -68,3 +68,17 @@ DEV-PLUGIN --
   vault write api/echo msg=abc
   vault write api/keypair entropy=256 passphrase="" uuid=9
   vault read api/signature uuid=9
+
+
+  vault write api/register uuid=manjeet
+  vault read api/signature uuid=manjeet path="m/44'/60'/0'/0/0"
+
+--------------------------------------------------------------------------------------------
+
+Unseal Key 1: De3svNrtKY4OE7lCPj/W3l6hU9o/2AdW3b/ZiPiwJwme
+Unseal Key 2: BwLIVePSimnkmNlZvj9PinIrbkXlmD8pEmaLRFedCWqt
+Unseal Key 3: UXLhcOSOokM6xnNv2IB2FMmeCU4oWEIeH2hRxlsWSljb
+Unseal Key 4: 1bKNU56laQge/fo2tjQ9RiTSF3luAQs6d9e3jew9n4o+
+Unseal Key 5: RLK0B1pp5BlwnHPC7zoMufqxC84olMvAb8BR/t6U22wR
+
+Initial Root Token: ec32c0ea-7dce-fd51-6452-f3f73a7ccc03
