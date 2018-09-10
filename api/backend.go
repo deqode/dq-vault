@@ -44,9 +44,9 @@ Registers new user in vault using UUID. Generates mnemonics if not provided and 
 
 `,
 				Fields: map[string]*framework.FieldSchema{
-					"uuid": &framework.FieldSchema{
+					"username": &framework.FieldSchema{
 						Type:        framework.TypeString,
-						Description: "UUID of new user",
+						Description: "Username of new user",
 						Default:     "",
 					},
 					"mnemonic": &framework.FieldSchema{
@@ -78,6 +78,14 @@ Registers new user in vault using UUID. Generates mnemonics if not provided and 
 					"path": &framework.FieldSchema{
 						Type:        framework.TypeString,
 						Description: "Deviation path to obtain keys",
+					},
+					"coinType": &framework.FieldSchema{
+						Type:        framework.TypeInt,
+						Description: "Cointype of transaction",
+					},
+					"payload": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "Raw TX JSON",
 					},
 				},
 				Callbacks: map[logical.Operation]framework.OperationFunc{

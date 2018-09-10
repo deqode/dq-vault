@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/tyler-smith/go-bip39"
 	"gitlab.com/arout/Vault/api/helpers"
+	"gitlab.com/arout/Vault/lib"
 
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
@@ -19,48 +19,33 @@ func (b *backend) pathRegister(ctx context.Context, req *logical.Request, d *fra
 	}
 
 	// obatin data provided
-	uuid := d.Get("uuid").(string)
+	username := d.Get("username").(string)
 	mnemonic := d.Get("mnemonic").(string)
 	passphrase := d.Get("passphrase").(string)
 	entropyLength := 256
 
+	//TODO: check if username exists or not
+
+	// generate UUID
+	uuid := helpers.NewUUID()
+	var err error
+
 	// generated storage path to store user info
 	storagePath := "users/" + uuid
 
-	// Obtain all existing UUID's from DB
-	vals, err := req.Storage.List(ctx, "users/")
-	if err != nil {
-		return nil, err
-	}
-
-	// check if UUID exists
-	for i := 0; i < len(vals); i++ {
-		if uuid == vals[i] {
-			return nil, logical.CodedError(http.StatusUnprocessableEntity, "Provided UUID already exists")
-		}
-	}
-
-	// Check if user provided UUID or not
-	if uuid == "" {
-		return nil, logical.CodedError(http.StatusUnprocessableEntity, "Provide a valid UUID")
-	}
-
 	if mnemonic == "" {
-		// generate entropy of desired length
-		entropy, err := bip39.NewEntropy(entropyLength)
-		helpers.CheckError(err, "Error generating entropy")
-
 		// generate new mnemonics if not provided by user
 		// obtain mnemonics from entropy
-		mnemonic, err = bip39.NewMnemonic(entropy)
+		mnemonic, err = lib.MnemonicFromEntropy(entropyLength)
 		helpers.CheckError(err, "Error generating mnemonics")
 	}
 
-	if !bip39.IsMnemonicValid(mnemonic) {
+	if !lib.IsMnemonicValid(mnemonic) {
 		log.Fatalf("Mnemonic is not valid")
 	}
 
 	user := &helpers.User{
+		Username:   username,
 		UUID:       uuid,
 		Mnemonic:   mnemonic,
 		Passphrase: passphrase,
@@ -72,6 +57,7 @@ func (b *backend) pathRegister(ctx context.Context, req *logical.Request, d *fra
 
 	return &logical.Response{
 		Data: map[string]interface{}{
+			"username":   username,
 			"uuid":       uuid,
 			"mnemonic":   mnemonic,
 			"passphrase": passphrase,

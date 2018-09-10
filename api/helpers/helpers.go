@@ -10,10 +10,12 @@ import (
 
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
+	"github.com/satori/go.uuid"
 )
 
 // User -- stores data related to user
 type User struct {
+	Username   string `json:"username"`
 	UUID       string `json:"uuid"`
 	Mnemonic   string `json:"mnemonic"`
 	Passphrase string `json:"passphrase"`
@@ -24,6 +26,10 @@ func CheckError(err error, message string) {
 	if err != nil {
 		log.Fatalf("%v - %v", message, err)
 	}
+}
+
+func NewUUID() string {
+	return uuid.Must(uuid.NewV4()).String()
 }
 
 // ErrMissingField returns a logical response error that prints a consistent
@@ -70,13 +76,14 @@ func New(text string) error {
 	return &errorString{text}
 }
 
-// ValidateUser - validates data provided by user
-func ValidateUser(ctx context.Context, req *logical.Request, uuid string, derivationPath string) error {
+// ValidateData - validates data provided provided to create signature
+func ValidateData(ctx context.Context, req *logical.Request, uuid string, derivationPath string) error {
 	// Check if user provided UUID or not
 	if uuid == "" {
 		return errors.New("Provide a valid UUID")
 	}
 
+	// TODO: check if derivation path is valid or not
 	// Check if user provided derivationPath or not
 	if derivationPath == "" {
 		return errors.New("Provide a valid path")
