@@ -7,8 +7,12 @@ import (
 	"gitlab.com/arout/Vault/lib/bip44coins"
 )
 
+// IRawTx Raw transaction interface
+// to enable decoding of all variants of raw transactions (JSON)
 type IRawTx interface{}
 
+// EthereumRawTx Ethereum raw transaction implements IRawTx
+// to store raw Ethereum JSON payload
 type EthereumRawTx struct {
 	Nonce    uint64 `json:"nonce"`
 	Value    uint64 `json:"value"`
@@ -20,6 +24,9 @@ type EthereumRawTx struct {
 	IRawTx
 }
 
+// DecodeRawTransaction decodes input payload into suitable raw transaction
+// depending on cointype provided
+// returns error if no supported coin type found
 func DecodeRawTransaction(coinType uint16, payload string) (IRawTx, error) {
 	switch coinType {
 	case bip44coins.Ether:

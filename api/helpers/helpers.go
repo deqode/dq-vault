@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"sort"
 
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
 	"github.com/satori/go.uuid"
+	"gitlab.com/arout/Vault/config"
 )
 
 // User -- stores data related to user
@@ -21,13 +21,7 @@ type User struct {
 	Passphrase string `json:"passphrase"`
 }
 
-// CheckError checks for any potential errors
-func CheckError(err error, message string) {
-	if err != nil {
-		log.Fatalf("%v - %v", message, err)
-	}
-}
-
+// NewUUID returns a random generated uuid
 func NewUUID() string {
 	return uuid.Must(uuid.NewV4()).String()
 }
@@ -90,11 +84,14 @@ func ValidateData(ctx context.Context, req *logical.Request, uuid string, deriva
 	}
 
 	// Obtain all existing UUID's from DB
-	vals, err := req.Storage.List(ctx, "users/")
-	CheckError(err, "")
+	vals, err := req.Storage.List(ctx, config.StorageBasePath)
+	if err != nil {
+		return err
+	}
 
 	var exists = false
 
+	// TODO: improve this
 	// check if UUID exists
 	for i := 0; i < len(vals); i++ {
 		if uuid == vals[i] {

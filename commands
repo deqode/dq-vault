@@ -42,11 +42,11 @@ export VAULT_ADDR='http://127.0.0.1:8200'
 
 vault operator init
 
-vault operator unseal Mt7WNQTl55/sQhKs4lg5iiJQ2RTL+fQd/wcRDdP9Cyxr
-vault operator unseal MOTQsCQdzVNXr1SkjoDA9Y2K5gUI/pFu6b9joBpoty0b
-vault operator unseal gGpfk5vyeRv26Vo7ohBAH8qnN2myYOberFgPU2uS/TaP
+vault operator unseal GkQZYqy1JfgoNyKsYa6kmnyrtqhsgBQjTDBUNra6XqoM
+vault operator unseal plqFN3omVRynvwquD4iCAjI/kvbkmAORg0rNNlu3jy8q
+vault operator unseal l3ZEQbR8Lk++Mlh9OoUrp9VpX+Ut1A69ebcEXQUPRRHD
 
-vault login 920cd5b6-4666-b681-3012-21af4338a976
+vault login d3d5b5aa-477b-28f5-fccc-872ae807873f
 
 vault secrets disable /api
 export SHA256=$(shasum -a 256 "/home/rails/GO/src/gitlab.com/arout/Vault/Vault" | cut -d' ' -f1)
@@ -61,7 +61,7 @@ vault secrets enable \
     plugin
 
 vault write api/register username=manjeet
-vault write api/signature uuid="2bcaa96e-1d30-4f2b-a2fe-51b1ee364788" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
+vault write api/signature uuid="d614118d-d674-4e91-9c10-f4f917cadbac" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
 
 
 

@@ -2,6 +2,8 @@ package baseadapter
 
 import "gitlab.com/arout/Vault/lib"
 
+// IBlockchainAdapter Blockchain Adapter Interface
+// contains common methods for all Blockchain Adapter variants
 type IBlockchainAdapter interface {
 	DerivePrivateKey() (string, error)
 	GetBlockchainNetwork() string
@@ -10,6 +12,8 @@ type IBlockchainAdapter interface {
 	CreateSignedTransaction(lib.IRawTx) (string, error)
 }
 
+// BlockchainAdapter contains common fields for
+// all Blockchain Adapter variants
 type BlockchainAdapter struct {
 	IBlockchainAdapter
 	Seed           []byte

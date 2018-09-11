@@ -1,15 +1,18 @@
 package adapter
 
 import (
+	"fmt"
+
 	"gitlab.com/arout/Vault/lib/adapter/baseadapter"
 	"gitlab.com/arout/Vault/lib/bip44coins"
 )
 
-func GetAdapter(coinType uint16, seed []byte, derivationPath string) baseadapter.IBlockchainAdapter {
+// GetAdapter returns suitable adapter depending on coin type
+func GetAdapter(coinType uint16, seed []byte, derivationPath string) (baseadapter.IBlockchainAdapter, error) {
 	switch coinType {
 	case bip44coins.Ether:
-		return NewEthereumAdapter(seed, derivationPath)
+		return NewEthereumAdapter(seed, derivationPath), nil
 	}
 
-	return nil
+	return nil, fmt.Errorf("Unable to find suitable adapter.\nUnsupported coin type %v", coinType)
 }

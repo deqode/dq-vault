@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"gitlab.com/arout/Vault/config"
 	"gitlab.com/arout/Vault/lib"
 	"gitlab.com/arout/Vault/lib/adapter"
 
@@ -17,10 +18,18 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	// obatin data provided
+	// UUID of user which want to sign transaction
 	uuid := d.Get("uuid").(string)
+
+	// derivation path
 	derivationPath := d.Get("path").(string)
+
+	// coin type of transaction
+	// see supported coinTypes lib/bipp44coins
 	coinType := d.Get("coinType").(int)
+
+	// data in JSON required for that transaction
+	// depends on type of transaction
 	payload := d.Get("payload").(string)
 
 	// validate data provided
@@ -28,14 +37,14 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	// TODO: validate data
+	// decodes JSON payload into object
 	rawTransaction, err := lib.DecodeRawTransaction(uint16(coinType), payload)
 	if err != nil {
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	// path where user data is stored in vault
-	path := "users/" + uuid
+	path := config.StorageBasePath + uuid
 	entry, err := req.Storage.Get(ctx, path)
 	if err != nil {
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
@@ -51,19 +60,22 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	// obtain seed from mnemonic and passphrase
 	seed, err := lib.SeedFromMnemonic(userInfo.Mnemonic, userInfo.Passphrase)
 
-	// get adapter based on cointype
-	adapter := adapter.GetAdapter(60, seed, derivationPath)
+	// blockchain dapater based on coinType
+	adapter, err := adapter.GetAdapter(uint16(coinType), seed, derivationPath)
+	if err != nil {
+		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
+	}
 
-	// generate ECDSA private key
+	// Generates and stores ECDSA private key in adapter
 	privateKey, err := adapter.DerivePrivateKey()
 
-	// sign payload sent by application server
+	// Signs raw transaction payload
 	txHex, err := adapter.CreateSignedTransaction(rawTransaction)
 	if err != nil {
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	//send signature back to the user
+	// Returns signature as output
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"raw":       rawTransaction,
