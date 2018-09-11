@@ -10,6 +10,8 @@ import (
 // GetAdapter returns suitable adapter depending on coin type
 func GetAdapter(coinType uint16, seed []byte, derivationPath string) (baseadapter.IBlockchainAdapter, error) {
 	switch coinType {
+	case bip44coins.Bitcoin:
+		return NewBitcoinAdapter(seed, derivationPath), nil
 	case bip44coins.Ether:
 		return NewEthereumAdapter(seed, derivationPath), nil
 	}
