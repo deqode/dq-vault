@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"gitlab.com/arout/Vault/lib"
@@ -22,28 +23,41 @@ func NewEthereumAdapter(seed []byte, derivationPath string) *EthereumAdapter {
 	adapter := new(EthereumAdapter)
 	adapter.Seed = seed
 	adapter.DerivationPath = derivationPath
+	adapter.IsDev = false
 
 	return adapter
 }
 
-func (e *EthereumAdapter) GetKeyPair() (string, error) {
-	keys, err := lib.GetECDSAKeys(e.Seed, e.DerivationPath)
+func (e *EthereumAdapter) DerivePrivateKey() (string, error) {
+	btcecPrivKey, err := lib.DerivePrivateKey(e.Seed, e.DerivationPath, e.IsDev)
 	if err != nil {
 		return "", err
 	}
 
-	e.PrivateKey = keys.PrivateKey
-	e.PublicKey = keys.PublicKey
+	privateKey := crypto.FromECDSA(btcecPrivKey.ToECDSA())
+	privateKeyHex := hexutil.Encode(privateKey)[2:]
+
+	e.PrivateKey = privateKeyHex
 
 	return e.PrivateKey, nil
 }
 
-func (e *EthereumAdapter) getWalletAddress() {}
+func (e *EthereumAdapter) GetBlockchainNetwork() string {
+	if e.IsDev {
+		return "testnet"
+	}
+	return "mainnet"
+}
 
-func (e *EthereumAdapter) getBlockchainNetwork(isDev bool) string { return "" }
+func (e *EthereumAdapter) SetEnvironmentToDevelopment() {
+	e.IsDev = true
+}
+
+func (e *EthereumAdapter) SetEnvironmentToProduction() {
+	e.IsDev = false
+}
 
 func (e *EthereumAdapter) CreateSignedTransaction(payload lib.IRawTx) (string, error) {
-	//generates ecdsa type key
 	privateKey, err := crypto.HexToECDSA(e.PrivateKey)
 	if err != nil {
 		return "", err

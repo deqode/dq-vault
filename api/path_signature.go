@@ -37,12 +37,16 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	// path where user data is stored in vault
 	path := "users/" + uuid
 	entry, err := req.Storage.Get(ctx, path)
-	helpers.CheckError(err, "")
+	if err != nil {
+		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
+	}
 
-	// create object of the actual struct stored
+	// obtain mnemonic, passphrase of user
 	var userInfo helpers.User
 	err = entry.DecodeJSON(&userInfo)
-	helpers.CheckError(err, "")
+	if err != nil {
+		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
+	}
 
 	// obtain seed from mnemonic and passphrase
 	seed, err := lib.SeedFromMnemonic(userInfo.Mnemonic, userInfo.Passphrase)
@@ -50,12 +54,14 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	// get adapter based on cointype
 	adapter := adapter.GetAdapter(60, seed, derivationPath)
 
-	// generate ECDSA keys
-	privateKey, err := adapter.GetKeyPair()
+	// generate ECDSA private key
+	privateKey, err := adapter.DerivePrivateKey()
 
 	// sign payload sent by application server
 	txHex, err := adapter.CreateSignedTransaction(rawTransaction)
-	helpers.CheckError(err, "")
+	if err != nil {
+		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
+	}
 
 	//send signature back to the user
 	return &logical.Response{

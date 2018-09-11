@@ -35,14 +35,12 @@ POSTGRES --
 --------------------------------------------------
 NON-DEV MODE --
 
-  sudo vault server -config=config1.hcl
-  sudo vault server -config=config2.hcl
+sudo vault server -config=config/config1.hcl
+sudo vault server -config=config/config2.hcl
 
-  export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_ADDR='http://127.0.0.1:8200'
 
-  vault operator init
-  vault operator unseal
-  vault login
+vault operator init
 
 vault operator unseal Mt7WNQTl55/sQhKs4lg5iiJQ2RTL+fQd/wcRDdP9Cyxr
 vault operator unseal MOTQsCQdzVNXr1SkjoDA9Y2K5gUI/pFu6b9joBpoty0b
@@ -50,22 +48,24 @@ vault operator unseal gGpfk5vyeRv26Vo7ohBAH8qnN2myYOberFgPU2uS/TaP
 
 vault login 920cd5b6-4666-b681-3012-21af4338a976
 
-  vault secrets disable /api
-  export SHA256=$(shasum -a 256 "/home/rails/GO/src/gitlab.com/arout/Vault/Vault" | cut -d' ' -f1)
+vault secrets disable /api
+export SHA256=$(shasum -a 256 "/home/rails/GO/src/gitlab.com/arout/Vault/Vault" | cut -d' ' -f1)
 
-  vault write sys/plugins/catalog/secrets-api \
-      sha_256="${SHA256}" \
-      command="Vault"
+vault write sys/plugins/catalog/secrets-api \
+    sha_256="${SHA256}" \
+    command="Vault"
 
-  vault secrets enable \
-      -path="api" \
-      -plugin-name="secrets-api" \
-      plugin
+vault secrets enable \
+    -path="api" \
+    -plugin-name="secrets-api" \
+    plugin
 
-  vault write api/register username=manjeet
-  vault write api/signature uuid="dc19df9c-4abc-4a47-8957-1d0556f5125d" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
+vault write api/register username=manjeet
+vault write api/signature uuid="2bcaa96e-1d30-4f2b-a2fe-51b1ee364788" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
 
-  vault write api/signature uuid="99147a64-a5d8-4067-9777-6b3734b40541" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
+
+
+vault write api/signature uuid="99147a64-a5d8-4067-9777-6b3734b40541" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
 vault write api/signature uuid="39dfb433-ef54-4a4e-8637-82de4470c2a9" path="m/44'/60'/0'/0/0" payload="{\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
 
 -----------------------------
@@ -83,32 +83,32 @@ POLICIES --
 ------------------------------------------------------------------
 
 DEV-PLUGIN --
-  vault server -dev -dev-plugin-dir="/etc/vault/plugins"
+vault server -dev -dev-plugin-dir="/etc/vault/plugins"
 
-  export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_ADDR='http://127.0.0.1:8200'
 
-  vault status
+vault status
 
-  vault secrets disable /api
-  export SHA256=$(shasum -a 256 "/home/rails/GO/src/gitlab.com/arout/Vault/Vault" | cut -d' ' -f1)
+vault secrets disable /api
+export SHA256=$(shasum -a 256 "/home/rails/GO/src/gitlab.com/arout/Vault/Vault" | cut -d' ' -f1)
 
-  vault write sys/plugins/catalog/secrets-api \
-      sha_256="${SHA256}" \
-      command="Vault"
+vault write sys/plugins/catalog/secrets-api \
+    sha_256="${SHA256}" \
+    command="Vault"
 
-  vault secrets enable \
-      -path="api" \
-      -plugin-name="secrets-api" \
-      plugin
+vault secrets enable \
+    -path="api" \
+    -plugin-name="secrets-api" \
+    plugin
 
-  vault write api/password length=36 symbols=0
-  vault write api/echo msg=abc
-  vault write api/keypair entropy=256 passphrase="" uuid=9
-  vault read api/signature uuid=9
+vault write api/password length=36 symbols=0
+vault write api/echo msg=abc
+vault write api/keypair entropy=256 passphrase="" uuid=9
+vault read api/signature uuid=9
 
 
-  vault write api/register uuid=manjeet
-  vault read api/signature uuid=manjeet path="m/44'/60'/0'/0/0"
+vault write api/register uuid=manjeet
+vault read api/signature uuid=manjeet path="m/44'/60'/0'/0/0"
 
 --------------------------------------------------------------------------------------------
 
