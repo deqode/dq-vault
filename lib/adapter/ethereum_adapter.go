@@ -72,6 +72,8 @@ func (e *EthereumAdapter) SetEnvironmentToProduction() {
 	e.IsDev = false
 }
 
+// TODO: verify in Dev mode
+
 // CreateSignedTransaction creates and signs raw transaction from payload data + private key
 func (e *EthereumAdapter) CreateSignedTransaction(payload lib.IRawTx) (string, error) {
 	// convert hex to ECDSA private key

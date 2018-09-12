@@ -47,6 +47,7 @@ func (b *BitcoinBaseAdapter) GetBlockchainNetwork() string {
 	return "mainnet"
 }
 
+// TODO: check testnet signature
 func (b *BitcoinBaseAdapter) SetEnvironmentToDevelopment() {
 	b.IsDev = true
 }
@@ -71,6 +72,9 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, erro
 	if err != nil {
 		return "", err
 	}
+
+	// TODO: add validation for txHash length and address length and
+	// index, amount should be >= 0
 
 	// add inputs to transaction
 	for _, utxo := range payload.Inputs {
@@ -106,6 +110,7 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, erro
 	var signedTx bytes.Buffer
 	transaction.Serialize(&signedTx)
 
+	// TODO: add validation as specified in tutorial
 	return hex.EncodeToString(signedTx.Bytes()), nil
 }
 

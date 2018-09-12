@@ -15,9 +15,9 @@ type IBlockchainAdapter interface {
 // BlockchainAdapter contains common fields for
 // all Blockchain Adapter variants
 type BlockchainAdapter struct {
-	IBlockchainAdapter
 	Seed           []byte
 	DerivationPath string
 	PrivateKey     string
 	IsDev          bool
+	IBlockchainAdapter
 }
