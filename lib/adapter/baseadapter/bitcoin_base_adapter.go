@@ -10,6 +10,7 @@ import (
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
+	log "github.com/mgutz/logxi/v1"
 	"gitlab.com/arout/Vault/lib"
 )
 
@@ -17,7 +18,7 @@ type BitcoinBaseAdapter struct {
 	BlockchainAdapter
 }
 
-func (b *BitcoinBaseAdapter) DerivePrivateKey() (string, error) {
+func (b *BitcoinBaseAdapter) DerivePrivateKey(logger log.Logger) (string, error) {
 	// obatin private key from seed + derivation path
 	btcecPrivKey, err := lib.DerivePrivateKey(b.Seed, b.DerivationPath, b.IsDev)
 	if err != nil {
@@ -56,13 +57,13 @@ func (b *BitcoinBaseAdapter) SetEnvironmentToProduction() {
 	b.IsDev = false
 }
 
-func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, error) {
+func (b *BitcoinBaseAdapter) CreateSignedTransaction(w string, p lib.IRawTx) (string, error) {
 	network := &chaincfg.MainNetParams
 	if b.IsDev {
 		network = &chaincfg.TestNet3Params
 	}
 
-	wif, err := btcutil.DecodeWIF(b.PrivateKey)
+	wif, err := btcutil.DecodeWIF(w)
 	if err != nil {
 		return "", err
 	}

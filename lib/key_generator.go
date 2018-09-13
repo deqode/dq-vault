@@ -15,6 +15,8 @@ import (
 // DefaultRootDerivationPath is the root path to which custom derivation endpoints
 // are appended. As such, the first account will be at m/44'/60'/0'/0, the second
 // at m/44'/60'/0'/1, etc.
+//
+// 0x80000000 represents harderend
 var defaultRootDerivationPath = derivationPath{0x80000000 + 44, 0x80000000 + 60, 0x80000000 + 0, 0}
 
 // DerivationPath represents the computer friendly version of a hierarchical
@@ -35,16 +37,19 @@ func DerivePrivateKey(seed []byte, path string, isDev bool) (*btcec.PrivateKey, 
 		network = &chaincfg.TestNet3Params
 	}
 
+	// parse derivation path
 	deriavtionPath, err := parseDerivationPath(path)
 	if err != nil {
 		return nil, err
 	}
 
+	// derive master node
 	key, err := hdkeychain.NewMaster(seed, network)
 	if err != nil {
 		return nil, err
 	}
 
+	// derive desired account node
 	for _, n := range deriavtionPath {
 		key, err = key.Child(n)
 		if err != nil {
