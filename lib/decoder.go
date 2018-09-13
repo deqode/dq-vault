@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"gitlab.com/arout/Vault/lib/bip44coins"
 )
@@ -11,10 +12,14 @@ import (
 // depending on cointype provided
 // returns error if no supported coin type found
 func DecodeRawTransaction(coinType uint16, payload string) (IRawTx, error) {
+	var err error
 	switch coinType {
 	case bip44coins.Bitcoin, bip44coins.TestNet:
 		var tx BitcoinRawTx
-		err := json.Unmarshal([]byte(payload), &tx)
+		if err = json.Unmarshal([]byte(payload), &tx); err != nil ||
+			reflect.DeepEqual(tx, BitcoinRawTx{}) {
+			return tx, fmt.Errorf("Unable to decode payload=[%v] into coin type %v", payload, coinType)
+		}
 		return tx, err
 	case bip44coins.Ether:
 		var tx EthereumRawTx
