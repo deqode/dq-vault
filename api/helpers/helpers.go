@@ -83,27 +83,23 @@ func ValidateData(ctx context.Context, req *logical.Request, uuid string, deriva
 		return errors.New("Provide a valid path")
 	}
 
-	// Obtain all existing UUID's from DB
+	if !UUIDExists(ctx, req, uuid) {
+		return errors.New("UUID does not exists")
+	}
+	return nil
+}
+
+// UUIDExists checks if uuid exists or not
+func UUIDExists(ctx context.Context, req *logical.Request, uuid string) bool {
 	vals, err := req.Storage.List(ctx, config.StorageBasePath)
 	if err != nil {
-		return err
+		return false
 	}
 
-	var exists = false
-
-	// TODO: improve this
-	// check if UUID exists
-	for i := 0; i < len(vals); i++ {
-		if uuid == vals[i] {
-			exists = true
-			break
+	for _, val := range vals {
+		if val == uuid {
+			return true
 		}
 	}
-
-	// if UUID not exists then return error
-	if !exists {
-		return errors.New("Provided UUID does not exists")
-	}
-
-	return nil
+	return false
 }

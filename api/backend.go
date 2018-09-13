@@ -28,6 +28,7 @@ type backend struct {
 // Backend creates a new backend.
 func Backend(c *logical.BackendConfig) *backend {
 	var b backend
+
 	b.Backend = &framework.Backend{
 		BackendType: logical.TypeLogical,
 		Help:        backendHelp,
@@ -109,7 +110,6 @@ get help.
 			},
 		},
 	}
-
 	return &b
 }
 

@@ -2,9 +2,9 @@ export VAULT_ADDR='http://127.0.0.1:8200'
 
 vault secrets disable /gen
 
-export SHA256=$(shasum -a 256 "/home/rails/blockchain/vault/ethereum-plugin/Vault-demo" | cut -d' ' -f1)
+export SHA256=$(shasum -a 256 "/home/rails/blockchain/vault/ethereum-plugin/Vault" | cut -d' ' -f1)
 
-vault write sys/plugins/catalog/secrets-gen     sha_256="${SHA256}"     command="Vault-demo"
+vault write sys/plugins/catalog/secrets-gen     sha_256="${SHA256}"     command="Vault"
 
 vault secrets enable     -path="gen"     -plugin-name="secrets-gen"     plugin
 
@@ -42,15 +42,17 @@ export VAULT_ADDR='http://127.0.0.1:8200'
 
 vault operator init
 
-vault operator unseal 4h2S9rIdETKQ/OOM4yGcKlWgaEMSP4a/qT/71ZroqfKI
-vault operator unseal yohfH7S1ktFc6WzSH8BA7Qi+jtWHHCXpr0cvy6SfdwVN
-vault operator unseal LBofL0058d8sqAk/J/O8axjdqaYqc/GdgOsOWZIeizyH
+vault operator unseal GkQZYqy1JfgoNyKsYa6kmnyrtqhsgBQjTDBUNra6XqoM
+vault operator unseal plqFN3omVRynvwquD4iCAjI/kvbkmAORg0rNNlu3jy8q
+vault operator unseal l3ZEQbR8Lk++Mlh9OoUrp9VpX+Ut1A69ebcEXQUPRRHD
 
-vault login 85de6efd-d036-9f0d-1c64-5e18e63adee9
-
+vault login d3d5b5aa-477b-28f5-fccc-872ae807873f
 
 vault secrets disable /api
 export SHA256=$(shasum -a 256 "/home/rails/GO/src/gitlab.com/arout/Vault/Vault" | cut -d' ' -f1)
+
+//aditya
+export SHA256=$(shasum -a 256 "/home/rails/blockchain/vault/ethereum-plugin/Vault" | cut -d' ' -f1)
 
 vault write sys/plugins/catalog/secrets-api \
     sha_256="${SHA256}" \
@@ -62,12 +64,11 @@ vault secrets enable \
     plugin
 
 vault write api/register username=manjeet
-vault write api/signature uuid="b2f3a3f6-d5f8-457f-9a81-9b19b3def500" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":100000000000000000,\"gasLimit\":21000,\"gasPrice\":5,\"to\":\"0x95273d64876408E0eDa01a45775Efc2Df6d1CfaC\",\"data\":\"\",\"chainId\":3}" coinType=60
+vault write api/signature uuid="d614118d-d674-4e91-9c10-f4f917cadbac" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
 
-vault write api/signature uuid="6ece02b4-70a0-4640-b18b-394e4b07068e" path="m/44'/0'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" coinType=0
+vault write api/signature uuid="1b402632-20f0-4fb9-b1b9-12f7af05a89c" path="m/44'/0'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"81b4c832d70cb56ff957589752eb412a4cab78a25a8fc52d6a09e5bd4404d48a\",\"vout\":0},{\"txhash\":\"9dd5264b09bd4aebc1d74b776e6669ba3f0e381ef2992c9434e4d0bee3068edb\",\"vout\":0}],\"outputs\":[{\"address\":\"1KKKK6N21XKo48zWKuQKXdvSsCf95ibHFa\",\"amount\":91234},{\"address\":\"1HPvK7CAYeHzCdBMBkuXeEsXdvX64yMkoE\",\"amount\":91234}]}" coinType=0
+vault write api/signature uuid="f242fb46-8d5f-44a2-a681-16a19296282a" path="m/44'/1'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"52c7279e852aab0f9c5150fb3db1a9f26029f41d41beb464a0d2adc72384c9a7\",\"vout\":0}],\"outputs\":[{\"address\":\"mk2covL3mw2UauEmZPKLuSBcrezeJGCJWS\",\"amount\":9000000}]}" coinType=0
 
-01000000017467b1085498de1b1ef408e65ba5a49210df2bd8660260416d193b69ff9516b3000000006b483045022100b4a8e19b31ff9fe89f5f8d14f2cd710e41b7eeea990ad7dcc31b677fd55f52b4022062e62b8a919ad9d3b6556c659c1d3f8ebe1fe08ec67186f51e46382d1737929101210376d870d1a3a91786ac186bdd11aef918b7c7d182ba61ad032aa894bd15bbcb13ffffffff01626401000000000017a9146916ea9f8135de454ecb1c22ade111ff48fb7c9f8700000000
-01000000017467b1085498de1b1ef408e65ba5a49210df2bd8660260416d193b69ff9516b3000000008b483045022100b4a8e19b31ff9fe89f5f8d14f2cd710e41b7eeea990ad7dcc31b677fd55f52b4022062e62b8a919ad9d3b6556c659c1d3f8ebe1fe08ec67186f51e46382d1737929101410476d870d1a3a91786ac186bdd11aef918b7c7d182ba61ad032aa894bd15bbcb130381e68257017f845eca098df4784479154e07ab9f102a29fe4f728fd009e83bffffffff01626401000000000017a9146916ea9f8135de454ecb1c22ade111ff48fb7c9f8700000000
 
 
 vault write api/signature uuid="99147a64-a5d8-4067-9777-6b3734b40541" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
@@ -163,3 +164,11 @@ vault write auth/cert/certs/application \
     policies=application \
     certificate=@web-cert.pem \
     ttl=3600
+
+
+..............................................................
+
+vault secrets disable /api
+export SHA256=$(shasum -a 256 "/home/rails/blockchain/vault/ethereum-plugin/Vault" | cut -d' ' -f1)
+vault write sys/plugins/catalog/secrets-api     sha_256="${SHA256}"     command="Vault"
+vault secrets enable     -path="api"     -plugin-name="secrets-api"     plugin
