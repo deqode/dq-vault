@@ -12,6 +12,12 @@ func GetAdapter(coinType uint16, seed []byte, derivationPath string) (baseadapte
 	switch coinType {
 	case bip44coins.Bitcoin:
 		return NewBitcoinAdapter(seed, derivationPath), nil
+	case bip44coins.TestNet:
+		// TODO: improve this
+		// sets network to testnet
+		testnetAdapter := NewBitcoinAdapter(seed, derivationPath)
+		testnetAdapter.SetEnvironmentToDevelopment()
+		return testnetAdapter, nil
 	case bip44coins.Ether:
 		return NewEthereumAdapter(seed, derivationPath), nil
 	}

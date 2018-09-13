@@ -14,6 +14,7 @@ import (
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
 	"github.com/btcsuite/btcutil/base58"
+	log "github.com/mgutz/logxi/v1"
 	"gitlab.com/arout/Vault/lib"
 )
 
@@ -21,7 +22,7 @@ type BitcoinBaseAdapter struct {
 	BlockchainAdapter
 }
 
-func (b *BitcoinBaseAdapter) DerivePrivateKey() (string, error) {
+func (b *BitcoinBaseAdapter) DerivePrivateKey(logger log.Logger) (string, error) {
 	// obatin private key from seed + derivation path
 	btcecPrivKey, err := lib.DerivePrivateKey(b.Seed, b.DerivationPath, b.IsDev)
 	if err != nil {
@@ -59,7 +60,7 @@ func (b *BitcoinBaseAdapter) SetEnvironmentToProduction() {
 	b.IsDev = false
 }
 
-func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, error) {
+func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx, logger log.Logger) (string, error) {
 	network := &chaincfg.MainNetParams
 	if b.IsDev {
 		network = &chaincfg.TestNet3Params
@@ -78,7 +79,8 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, erro
 	}
 
 	if len(payload.Inputs) == 0 || len(payload.Outputs) == 0 {
-		return "", errors.New("invalid payload structure")
+		logger.Info(fmt.Sprintf("\n[ERROR ] signature: Invalid payload structure"))
+		return "", errors.New("Invalid payload structure")
 	}
 
 	//generate pubkeyScript from sender's public key
@@ -87,12 +89,15 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, erro
 	addr, err := btcutil.NewAddressPubKeyHash(pubKeyHash, network)
 	pkScript, err := txscript.PayToAddrScript(addr)
 	if err != nil {
-		fmt.Println(err)
+		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err))
+		return "", err
 	}
 
 	//generating sender's address from sender's public key
 	p2pk, _ := btcutil.NewAddressPubKey(pubkey.SerializeCompressed(), network)
 	sourceAddress := p2pk.AddressPubKeyHash().EncodeAddress()
+
+	logger.Info(fmt.Sprintf("\n[INFO ] signature: from %v", sourceAddress))
 
 	transaction := wire.NewMsgTx(wire.TxVersion)
 
@@ -100,9 +105,11 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, erro
 	for _, utxo := range payload.Inputs {
 		//check for valid utxo format
 		if len(utxo.TxHash) != 64 {
-			return "", errors.New("provide correct UTXO hash")
+			logger.Info(fmt.Sprintf("\n[ERROR ] signature: Invalid UTXO hash - %v", utxo.TxHash))
+			return "", fmt.Errorf("Invalid UTXO hash - %v", utxo.TxHash)
 		}
 
+		logger.Info(fmt.Sprintf("\n[INFO ] signature: txId %v, vout %v", utxo.TxHash, utxo.Vout))
 		hash, _ := chainhash.NewHashFromStr(utxo.TxHash)
 		out := wire.NewOutPoint(hash, utxo.Vout)
 		txIn := wire.NewTxIn(out, nil, nil)
@@ -114,16 +121,18 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, erro
 	//adding transaction outputs
 	for _, out := range payload.Outputs {
 		if out.Amount < 0 {
-			return "", errors.New("amount can't be negative")
+			logger.Info(fmt.Sprintf("\n[ERROR ] signature: Invalid payee amount %v", out.Amount))
+			return "", fmt.Errorf("Invalid payee amount %v", out.Amount)
 		}
 
 		//check for to payee address validity
 		_, _, err := base58.CheckDecode(out.Address)
 		if err != nil {
 			if err == base58.ErrChecksum {
-				return "", errors.New("checksum mismatch")
+				logger.Info(fmt.Sprintf("\n[ERROR ] signature: Payee address checksum mismatch"))
+				return "", errors.New("Payee address checksum mismatch")
 			}
-			return "", errors.New("decoded address is of unknown format")
+			return "", errors.New("Invalid payee address format")
 		}
 
 		if out.Address == sourceAddress {
@@ -136,6 +145,8 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, erro
 			transaction.AddTxOut(wire.NewTxOut(out.Amount, destinationPkScript))
 			totalAmount += out.Amount
 		}
+
+		logger.Info(fmt.Sprintf("\n[INFO ] signature: Payee address %v, amount %v", out.Address, out.Amount))
 	}
 
 	// Sign the redeeming transaction.
@@ -149,7 +160,8 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, erro
 		sigScript, err := txscript.SignTxOutput(network, transaction, i, pkScript, txscript.SigHashAll, txscript.KeyClosure(lookupKey), nil, nil)
 
 		if err != nil {
-			fmt.Println(err)
+			logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err))
+			return "", err
 		}
 		transaction.TxIn[i].SignatureScript = sigScript
 	}
@@ -164,11 +176,17 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx) (string, erro
 		txscript.ScriptDiscourageUpgradableNops
 	vm, err := txscript.NewEngine(pkScript, transaction, 0, flags, nil, nil, totalAmount)
 	if err != nil {
+		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err))
 		return "", err
 	}
 	if err := vm.Execute(); err != nil {
+		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err))
 		return "", err
 	}
+
+	logger.Info(fmt.Sprintf("\n[INFO ] signature: from %v", err))
+	logger.Info(fmt.Sprintf("\n[INFO ] signature: to %v", err))
+	logger.Info(fmt.Sprintf("\n[INFO ] signature: from %v", err))
 
 	return hex.EncodeToString(signedTx.Bytes()), nil
 
