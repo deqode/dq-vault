@@ -17,24 +17,17 @@ type EthereumRawTx struct {
 	IRawTx
 }
 
-// UTXO to store bitcoin based transaction's inputs
-type UTXO struct {
-	TxHash string `json:"txhash"`
-	Vout   uint32 `json:"vout"`
-}
-
-// PayeeAddress to store bitcoin based
-// transactions output details
-type PayeeAddress struct {
-	Address string `json:"address"`
-	Amount  int64  `json:"amount"`
-}
-
 // BitcoinRawTx stores bitcoin based raw transaction payloads
 // stores input UTXO's and output Addresses
 // implements IRawTx
 type BitcoinRawTx struct {
-	Inputs  []*UTXO         `json:"inputs"`
-	Outputs []*PayeeAddress `json:"outputs"`
+	Inputs []struct {
+		Txhash string `json:"txhash"`
+		Vout   uint32 `json:"vout"`
+	} `json:"inputs"`
+	Outputs []struct {
+		Address string `json:"address"`
+		Amount  int64  `json:"amount"`
+	} `json:"outputs"`
 	IRawTx
 }

@@ -97,13 +97,13 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx, backendLogger
 	//adding transaction inputs
 	for _, utxo := range payload.Inputs {
 		//check for valid utxo format
-		if len(utxo.TxHash) != 64 {
-			logger.Log(backendLogger, config.Error, "signature:", fmt.Sprintf("Invalid UTXO hash - %v", utxo.TxHash))
-			return "", fmt.Errorf("Invalid UTXO hash - %v", utxo.TxHash)
+		if len(utxo.Txhash) != 64 {
+			logger.Log(backendLogger, config.Error, "signature:", fmt.Sprintf("Invalid UTXO hash - %v", utxo.Txhash))
+			return "", fmt.Errorf("Invalid UTXO hash - %v", utxo.Txhash)
 		}
 
-		logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("txId %v, vout %v", utxo.TxHash, utxo.Vout))
-		hash, _ := chainhash.NewHashFromStr(utxo.TxHash)
+		logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("txId %v, vout %v", utxo.Txhash, utxo.Vout))
+		hash, _ := chainhash.NewHashFromStr(utxo.Txhash)
 		out := wire.NewOutPoint(hash, utxo.Vout)
 		txIn := wire.NewTxIn(out, nil, nil)
 		transaction.AddTxIn(txIn)
