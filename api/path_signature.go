@@ -39,7 +39,7 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("request uuid=%v path=[%v] cointype=%v payload=[%v]", uuid, derivationPath, coinType, payload))
 
 	// validate data provided
-	if err := helpers.ValidateData(ctx, req, uuid, derivationPath, coinType); err != nil {
+	if err := helpers.ValidateData(ctx, req, uuid, derivationPath); err != nil {
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
