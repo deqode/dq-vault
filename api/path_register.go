@@ -86,10 +86,7 @@ func (b *backend) pathRegister(ctx context.Context, req *logical.Request, d *fra
 	// return response
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"username":   username,
-			"uuid":       uuid,
-			"mnemonic":   mnemonic,
-			"passphrase": passphrase,
+			"uuid": uuid,
 		},
 	}, nil
 }

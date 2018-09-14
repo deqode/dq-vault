@@ -182,7 +182,13 @@ vault write auth/cert/certs/application \
     certificate=@web-cert.pem \
     ttl=3600
 
+..............................................................
+userpass method:-
+vault auth enable userpass
 
+vault write auth/userpass/users/appserver1 password=secret policies=application
+
+vault login -method=userpass username-appserver1 password=secret
 ..............................................................
 
 vault secrets disable /api

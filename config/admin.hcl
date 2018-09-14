@@ -46,8 +46,8 @@ path "sys/health"
   capabilities = ["read", "sudo"]
 }
 
-# Use gen plugin
-path "gen/*"
+# Use api plugin
+path "api/*"
 {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
