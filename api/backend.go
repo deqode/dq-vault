@@ -88,11 +88,6 @@ Returns randomly generated user UUID
 						Type:        framework.TypeString,
 						Description: "Raw transaction payload",
 					},
-					"isDev": &framework.FieldSchema{
-						Type:        framework.TypeBool,
-						Description: "Mainnet or TestNet",
-						Default:     false,
-					},
 				},
 				Callbacks: map[logical.Operation]framework.OperationFunc{
 					logical.UpdateOperation: b.pathSignature,

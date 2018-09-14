@@ -73,7 +73,7 @@ func New(text string) error {
 }
 
 // ValidateData - validates data provided provided to create signature
-func ValidateData(ctx context.Context, req *logical.Request, uuid string, derivationPath string, coinType int, isDev bool) error {
+func ValidateData(ctx context.Context, req *logical.Request, uuid string, derivationPath string, coinType int) error {
 	// Check if user provided UUID or not
 	if uuid == "" {
 		return errors.New("Provide a valid UUID")

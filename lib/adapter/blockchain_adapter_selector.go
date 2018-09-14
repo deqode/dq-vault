@@ -8,12 +8,14 @@ import (
 )
 
 // GetAdapter returns suitable adapter depending on coin type
-func GetAdapter(coinType uint16, seed []byte, derivationPath string, isDev bool) (baseadapter.IBlockchainAdapter, error) {
+func GetAdapter(coinType uint16, seed []byte, derivationPath string) (baseadapter.IBlockchainAdapter, error) {
 	switch coinType {
-	case bip44coins.Bitcoin, bip44coins.TestNet:
-		return NewBitcoinAdapter(seed, derivationPath, isDev), nil
+	case bip44coins.Bitcoin:
+		return NewBitcoinAdapter(seed, derivationPath, false), nil
+	case bip44coins.TestNet:
+		return NewBitcoinAdapter(seed, derivationPath, true), nil
 	case bip44coins.Ether:
-		return NewEthereumAdapter(seed, derivationPath, isDev), nil
+		return NewEthereumAdapter(seed, derivationPath, false), nil
 	}
 
 	return nil, fmt.Errorf("Unable to find suitable adapter.\nUnsupported coin type %v", coinType)

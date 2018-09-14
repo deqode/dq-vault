@@ -36,13 +36,10 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	// depends on type of transaction
 	payload := d.Get("payload").(string)
 
-	// use Mainnet or TestNet?
-	isDev := d.Get("isDev").(bool)
-
-	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("request uuid=%v path=[%v] cointype=%v payload=[%v] isDev = %v", uuid, derivationPath, coinType, payload, isDev))
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("request uuid=%v path=[%v] cointype=%v payload=[%v]", uuid, derivationPath, coinType, payload))
 
 	// validate data provided
-	if err := helpers.ValidateData(ctx, req, uuid, derivationPath, coinType, isDev); err != nil {
+	if err := helpers.ValidateData(ctx, req, uuid, derivationPath, coinType); err != nil {
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
@@ -74,7 +71,7 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	seed, err := lib.SeedFromMnemonic(userInfo.Mnemonic, userInfo.Passphrase)
 
 	// obtains blockchain adapater based on coinType
-	adapter, err := adapter.GetAdapter(uint16(coinType), seed, derivationPath, isDev)
+	adapter, err := adapter.GetAdapter(uint16(coinType), seed, derivationPath)
 	if err != nil {
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
