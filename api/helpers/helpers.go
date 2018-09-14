@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
@@ -71,16 +73,22 @@ func New(text string) error {
 }
 
 // ValidateData - validates data provided provided to create signature
-func ValidateData(ctx context.Context, req *logical.Request, uuid string, derivationPath string) error {
+func ValidateData(ctx context.Context, req *logical.Request, uuid string, derivationPath string, coinType int, isDev bool) error {
 	// Check if user provided UUID or not
 	if uuid == "" {
 		return errors.New("Provide a valid UUID")
 	}
 
-	// TODO: check if derivation path is valid or not
-	// Check if user provided derivationPath or not
-	if derivationPath == "" {
+	// base check: if derivation path is valid or not
+	components := strings.Split(derivationPath, "/")
+	if derivationPath == "" || len(components) != 6 {
 		return errors.New("Provide a valid path")
+	}
+
+	// checks if coinType and derivation path is consistent or not
+	coin := strings.TrimSuffix(strings.TrimSpace(components[2]), "'")
+	if coin != strconv.Itoa(coinType) {
+		return fmt.Errorf("Inconsistent data, coinType=%v path=[%v]", coinType, derivationPath)
 	}
 
 	if !UUIDExists(ctx, req, uuid) {
