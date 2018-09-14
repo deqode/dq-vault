@@ -12,8 +12,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	log "github.com/mgutz/logxi/v1"
+	"gitlab.com/arout/Vault/config"
 	"gitlab.com/arout/Vault/lib"
 	"gitlab.com/arout/Vault/lib/adapter/baseadapter"
+	"gitlab.com/arout/Vault/logger"
 )
 
 // EthereumAdapter - Ethereum blockchain transaction adapter
@@ -24,11 +26,11 @@ type EthereumAdapter struct {
 
 // NewEthereumAdapter constructor function for EthereumAdapter
 // sets seed, derivation path as internal data
-func NewEthereumAdapter(seed []byte, derivationPath string) *EthereumAdapter {
+func NewEthereumAdapter(seed []byte, derivationPath string, isDev bool) *EthereumAdapter {
 	adapter := new(EthereumAdapter)
 	adapter.Seed = seed
 	adapter.DerivationPath = derivationPath
-	adapter.IsDev = false
+	adapter.IsDev = isDev
 	adapter.zeroAddress = "0x0000000000000000000000000000000000000000"
 
 	return adapter
@@ -36,11 +38,11 @@ func NewEthereumAdapter(seed []byte, derivationPath string) *EthereumAdapter {
 
 // DerivePrivateKey Derives derivation path to obtain private key
 // checks for errors
-func (e *EthereumAdapter) DerivePrivateKey(logger log.Logger) (string, error) {
+func (e *EthereumAdapter) DerivePrivateKey(backendLogger log.Logger) (string, error) {
 	// obatin private key from seed + derivation path
 	btcecPrivKey, err := lib.DerivePrivateKey(e.Seed, e.DerivationPath, e.IsDev)
 	if err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return "", err
 	}
 
@@ -66,37 +68,25 @@ func (e *EthereumAdapter) GetBlockchainNetwork() string {
 	return "mainnet"
 }
 
-// SetEnvironmentToDevelopment sets environment to Development
-func (e *EthereumAdapter) SetEnvironmentToDevelopment() {
-	e.IsDev = true
-}
-
-// SetEnvironmentToProduction sets environment to Mainnet
-func (e *EthereumAdapter) SetEnvironmentToProduction() {
-	e.IsDev = false
-}
-
-// TODO: verify in Dev mode
-
 // CreateSignedTransaction creates and signs raw transaction from payload data + private key
-func (e *EthereumAdapter) CreateSignedTransaction(payload lib.IRawTx, logger log.Logger) (string, error) {
+func (e *EthereumAdapter) CreateSignedTransaction(payload lib.IRawTx, backendLogger log.Logger) (string, error) {
 	// convert hex to ECDSA private key
 	privateKey, err := crypto.HexToECDSA(e.PrivateKey)
 	if err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return "", err
 	}
 
 	// creates raw transaction from payload
-	tx, chainID, err := e.createRawTransaction(payload, logger)
+	tx, chainID, err := e.createRawTransaction(payload, backendLogger)
 	if err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return "", err
 	}
 	// sign raw transaction using raw transaction + chainId + private key
 	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(big.NewInt(chainID)), privateKey)
 	if err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return "", err
 	}
 	// obtains signed transaction hex
@@ -108,30 +98,30 @@ func (e *EthereumAdapter) CreateSignedTransaction(payload lib.IRawTx, logger log
 
 // generates raw transaction from payload
 // returns raw transaction + chainId + error (if any)
-func (e *EthereumAdapter) createRawTransaction(p lib.IRawTx, logger log.Logger) (*types.Transaction, int64, error) {
+func (e *EthereumAdapter) createRawTransaction(p lib.IRawTx, backendLogger log.Logger) (*types.Transaction, int64, error) {
 	data, _ := json.Marshal(p)
 	var payload lib.EthereumRawTx
 	err := json.Unmarshal(data, &payload)
 	if err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, 0, err
 	}
 
 	// validate payload data
 	valid, txType := validatePayload(payload, e.zeroAddress)
 	if !valid {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: Invalid payload data"))
+		logger.Log(backendLogger, config.Error, "signature:", "Invalid payload data")
 		return nil, 0, errors.New("Invalid payload data")
 	}
 
 	// logging transaction payload info
-	logger.Info(fmt.Sprintf("\n[INFO ] signature: type - %v", txType))
-	logger.Info(fmt.Sprintf("\n[INFO ] signature: to - %v", payload.To))
-	logger.Info(fmt.Sprintf("\n[INFO ] signature: gas limit - %v", payload.GasLimit))
-	logger.Info(fmt.Sprintf("\n[INFO ] signature: gas price - %v", payload.GasPrice))
-	logger.Info(fmt.Sprintf("\n[INFO ] signature: value - %v", payload.Value))
-	logger.Info(fmt.Sprintf("\n[INFO ] signature: data - %v", payload.Data))
-	logger.Info(fmt.Sprintf("\n[INFO ] signature: chain id - %v", payload.ChainID))
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("type - %v", txType))
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("to - %v", payload.To))
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("gas limit - %v", payload.GasLimit))
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("gas price - %v", payload.GasPrice))
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("value - %v", payload.Value))
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("data - %v", payload.Data))
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("chain id - %v", payload.ChainID))
 
 	// create raw transaction from payload data
 	return types.NewTransaction(

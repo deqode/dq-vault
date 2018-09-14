@@ -61,15 +61,29 @@ vault secrets enable \
     plugin
 
 vault write api/register username=manjeet
-vault write api/signature uuid="c14f45e4-f9d6-47d6-8a80-5d848c0aa5c7" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":100000000000000000,\"gasLimit\":21000,\"gasPrice\":5,\"to\":\"0x95273d64876408E0eDa01a45775Efc2Df6d1CfaC\",\"data\":\"\",\"chainId\":3}" coinType=60
-vault write api/signature uuid="d614118d-d674-4e91-9c10-f4f917cadbac" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
 
-vault write api/signature uuid="6ece02b4-70a0-4640-b18b-394e4b07068e" path="m/44'/0'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" coinType=0
+vault write api/signature uuid="0c607814-c1ba-4e2d-9d53-87e00c7d2748" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":100000000000000000,\"gasLimit\":21000,\"gasPrice\":5,\"to\":\"0x95273d64876408E0eDa01a45775Efc2Df6d1CfaC\",\"data\":\"\",\"chainId\":3}" coinType=60
+
+
+vault write api/signature uuid="0ff1be47-3bcc-4243-b313-8f7f5e191b98" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
+
+vault write api/signature uuid="0ff1be47-3bcc-4243-b313-8f7f5e191b98" path="m/44'/0'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" coinType=0
+
+vault write api/signature uuid="0ff1be47-3bcc-4243-b313-8f7f5e191b98" path="m/44'/0'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" coinType=0 isDev=false
+
+vault write api/signature uuid="0ff1be47-3bcc-4243-b313-8f7f5e191b98" path="m/44'/0'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" coinType=0 isDev=true
+
+vault write api/signature uuid="0ff1be47-3bcc-4243-b313-8f7f5e191b98" path="m/44'/1'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" coinType=1 isDev=false
+
+vault write api/signature uuid="0ff1be47-3bcc-4243-b313-8f7f5e191b98" path="m/44'/1'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" coinType=1 isDev=true
+
+vault write api/signature uuid="0ff1be47-3bcc-4243-b313-8f7f5e191b98" path="m/44'/0'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" coinType=1 isDev=true
+
 
 vault write api/signature uuid="d614118d-d674-4e91-9c10-f4f917cadbac" path="m/44'/60'/0'/0/0" payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" coinType=60
 
 vault write api/signature uuid="1b402632-20f0-4fb9-b1b9-12f7af05a89c" path="m/44'/0'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"81b4c832d70cb56ff957589752eb412a4cab78a25a8fc52d6a09e5bd4404d48a\",\"vout\":0},{\"txhash\":\"9dd5264b09bd4aebc1d74b776e6669ba3f0e381ef2992c9434e4d0bee3068edb\",\"vout\":0}],\"outputs\":[{\"address\":\"1KKKK6N21XKo48zWKuQKXdvSsCf95ibHFa\",\"amount\":91234},{\"address\":\"1HPvK7CAYeHzCdBMBkuXeEsXdvX64yMkoE\",\"amount\":91234}]}" coinType=0
-vault write api/signature uuid="030e2d59-7aad-4fe1-8176-a4a01bc1dde1" path="m/44'/1'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"52c7279e852aab0f9c5150fb3db1a9f26029f41d41beb464a0d2adc72384c9a7\",\"vout\":0}],\"outputs\":[{\"address\":\"mk2covL3mw2UauEmZPKLuSBcrezeJGCJWS\",\"amount\":9000000}]}" coinType=1
+vault write api/signature uuid="0009e528-21b4-44db-91bb-ef8b0026e59b" path="m/44'/0'/0'/0/0" payload="{\"inputs\":[{\"txhash\":\"52c7279e852aab0f9c5150fb3db1a9f26029f41d41beb464a0d2adc72384c9a7\",\"vout\":0}],\"outputs\":[{\"address\":\"mk2covL3mw2UauEmZPKLuSBcrezeJGCJWS\",\"amount\":9000000}]}" coinType=1
 
 
 

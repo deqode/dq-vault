@@ -10,8 +10,6 @@ import (
 type IBlockchainAdapter interface {
 	DerivePrivateKey(log.Logger) (string, error)
 	GetBlockchainNetwork() string
-	SetEnvironmentToDevelopment()
-	SetEnvironmentToProduction()
 	CreateSignedTransaction(lib.IRawTx, log.Logger) (string, error)
 }
 

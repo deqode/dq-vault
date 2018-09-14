@@ -9,15 +9,16 @@ import (
 	"gitlab.com/arout/Vault/config"
 	"gitlab.com/arout/Vault/lib"
 	"gitlab.com/arout/Vault/lib/adapter"
+	"gitlab.com/arout/Vault/logger"
 
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
 )
 
 func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
-	logger := b.Backend.Logger()
+	backendLogger := b.Backend.Logger()
 	if err := helpers.ValidateFields(req, d); err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err.Error()))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
@@ -35,18 +36,21 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	// depends on type of transaction
 	payload := d.Get("payload").(string)
 
-	logger.Info(fmt.Sprintf("\n[INFO ] signature: request uuid=%v path=[%v] cointype=%v payload=[%v]", uuid, derivationPath, coinType, payload))
+	// use Mainnet or TestNet?
+	isDev := d.Get("isDev").(bool)
+
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("request uuid=%v path=[%v] cointype=%v payload=[%v] isDev = %v", uuid, derivationPath, coinType, payload, isDev))
 
 	// validate data provided
-	if err := helpers.ValidateData(ctx, req, uuid, derivationPath); err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err.Error()))
+	if err := helpers.ValidateData(ctx, req, uuid, derivationPath, coinType, isDev); err != nil {
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	// decodes JSON payload into object
 	rawTransaction, err := lib.DecodeRawTransaction(uint16(coinType), payload)
 	if err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err.Error()))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
@@ -54,7 +58,7 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	path := config.StorageBasePath + uuid
 	entry, err := req.Storage.Get(ctx, path)
 	if err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err.Error()))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
@@ -62,7 +66,7 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	var userInfo helpers.User
 	err = entry.DecodeJSON(&userInfo)
 	if err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err.Error()))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
@@ -70,23 +74,23 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	seed, err := lib.SeedFromMnemonic(userInfo.Mnemonic, userInfo.Passphrase)
 
 	// obtains blockchain adapater based on coinType
-	adapter, err := adapter.GetAdapter(uint16(coinType), seed, derivationPath)
+	adapter, err := adapter.GetAdapter(uint16(coinType), seed, derivationPath, isDev)
 	if err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err.Error()))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	// Generates and stores ECDSA private key in adapter
-	privateKey, err := adapter.DerivePrivateKey(logger)
+	privateKey, err := adapter.DerivePrivateKey(backendLogger)
 
 	// creates signature from raw transaction payload
-	txHex, err := adapter.CreateSignedTransaction(rawTransaction, logger)
+	txHex, err := adapter.CreateSignedTransaction(rawTransaction, backendLogger)
 	if err != nil {
-		logger.Info(fmt.Sprintf("\n[ERROR ] signature: %v", err.Error()))
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	logger.Info(fmt.Sprintf("\n[INFO ] signature: created signature uuid=%v signature=[%v]", uuid, txHex))
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("\n[INFO ] signature: created signature uuid=%v signature=[%v]", uuid, txHex))
 
 	// Returns signature as output
 	return &logical.Response{
