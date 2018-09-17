@@ -71,7 +71,7 @@ Assuming that you have postgreSQL installed in your system, you need to create a
 
 Once you are into PostgreSQL shell prompt, run the following commands to create a table:
 
-  ```sh
+  ```
 
     postgres=# create database vault;
 
@@ -125,7 +125,7 @@ Once you have created the config.hcl configuration file, we can now start our va
   ```
 Now that the vault server is up and running, it is actually in a sealed state, that is vault functionalities can't be accessed yet. To access vault we need to unseal it. First, open another terminal window and initialize vault by running the following commands:
 
-  ```sh
+  ```
       $ export VAULT_ADDR='http://127.0.0.1:8200' 
 
       $ vault operator init
