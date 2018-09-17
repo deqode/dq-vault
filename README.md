@@ -1,113 +1,352 @@
-# Password Generator for HashiCorp Vault
+## Introduction
+## Vault installation
 
-[![Build Status](https://travis-ci.org/sethvargo/vault-secrets-gen.svg?branch=master)](https://travis-ci.org/sethvargo/vault-secrets-gen)
+First thing you need to do is to install vault to set-up a vault server. 
+- To install Vault, find the [appropriate package](https://www.vaultproject.io/downloads.html) for your system and download it. Vault is packaged as a zip archive. 
+- After downloading Vault, unzip the package. Vault runs as a single binary named vault.
+- Copy the vault binary to your `PATH`. In ubuntu, PATH should be the `usr/bin` directory.
+- To verify the installation, type vault in your terminal. You should see help output similar to following:
 
-The Vault Password Generator is a [Vault](https://www.vaultproject.io) secrets
-plugin for generating cryptographically secure passwords and passphrases.
+  ```
+    $ vault
+    Usage: vault <command> [args]
 
-This is both a real custom Vault secrets plugin, and an example of how to build,
-install, and maintain your own Vault secrets plugin.
+    Common commands:
+        read        Read data and retrieves secrets
+        write       Write data, configuration, and secrets
+        delete      Delete secrets and configuration
+        list        List data or secrets
+        login       Authenticate locally
+        server      Start a Vault server
+        status      Print seal and HA status
+        unwrap      Unwrap a wrapped secret
 
-## Setup
+    Other commands:
+        audit          Interact with audit devices
+        auth           Interact with auth methods
+        lease          Interact with leases
+        operator       Perform operator-specific tasks
+        path-help      Retrieve API help for paths
+        policy         Interact with policies
+        secrets        Interact with secrets engines
+        ssh            Initiate an SSH session
+        token          Interact with tokens
 
-The setup guide assumes some familiarity with Vault and Vault's plugin
-ecosystem. You must have a Vault server already running, unsealed, and
-authenticated.
+  ```
+- You can find the official installation guide [here](https://www.vaultproject.io/intro/getting-started/install.html)
 
-1. Download and decompress the latest plugin binary from the Releases tab on
-GitHub. Alternatively you can compile the plugin from source, if you're into
-that kinda thing.
+## Get go files and Build plugin
 
-1. Move the compiled plugin into Vault's configured `plugin_directory`:
+Assuming that you have golang installed and your GOPATH configured, get the plugin repository and run the build command in that folder:
 
-    ```sh
-    $ mv vault-secrets-gen /etc/vault/plugins/vault-secrets-gen
-    ```
+  ```sh
+    $ go build
+  ```
+This will you give you a binary executable file with the name `Vault`. 
 
-1. Calculate the SHA256 of the plugin and register it in Vault's plugin catalog.
-If you are downloading the pre-compiled binary, it is highly recommended that
-you use the published checksums to verify integrity.
+Now move this binary file to a directory which the vault will use as its plugin directory. The plugin directory is where the vault looks up for available plugins.
 
-    ```sh
-    $ export SHA256=$(shasum -a 256 "/etc/vault/plugins/vault-secrets-gen" | cut -d' ' -f1)
+  ```sh
+    $ mv Vault /etc/vault/plugins/Vault
+  ```
+**The above path is just an example, you can change the etc path to your own desired path.** 
 
-    $ vault write sys/plugins/catalog/secrets-gen \
+## Set up postgres
+
+## Populate config file
+This is the step where we define the vault configurations. Vault supports .hcl files to write your configurations and set-up vault accordingly. 
+
+Given below is an example of a config.hcl file:
+
+ ```
+  config.hcl:-
+
+  "api_addr" = "http://127.0.0.1:8200"
+
+  storage "postgresql" {
+    connection_url = "postgres://role:password@localhost:5432/databaseName?sslmode=disable"
+    table = "tableName"	
+  }
+
+  listener "tcp" {
+  address     = "127.0.0.1:8200"
+  tls_disable = 1
+  }
+
+  "plugin_directory" = "/etc/vault/plugins"
+ ```
+
+- api_addr defines the access port of vault. All the requests to vault will be done via this port.
+- Storage defines the backend-storage type that vault will use to store all the encrypted data. Since this backend-storage is not a part of vault, we define the access port of postgreSQL server and the table name which is already created. Change the role, password, databaseName and tableName according to your postgres parameters. Note that we have disabled SSL for database requests.
+- In the listener part we have disabled TLS. If activated, TLS certificates and keys have to be provided here also. The example above listens on localhost port 8200 without TLS.
+- Lastly we have defined the plugin directory where the vault looks for plugins. Remember to change this according to your desired path where you stored the Vault bin file earlier.
+
+## Vault Setup
+
+Once you have created the config.hcl configuration file, we can now start our vault server. Open the terminal in the folder containing the config file and start the server by running the following command:
+
+  ```sh
+      $ sudo vault server -config=config.hcl
+  ```
+Now that the vault server is up and running, it is actually in a sealed state, that is vault functionalities can't be accessed yet. To access vault we need to unseal it. First, open another terminal window and initialize vault by running the following commands:
+
+  ```sh
+      $ export VAULT_ADDR='http://127.0.0.1:8200' 
+
+      $ vault operator init
+  ```
+
+The first command is required for non-TLS mode. The output is a set of 5 shamir keys which have the capability to unseal vault and an initial root token. Here vault is initialized in such a way that any 3 keys out of 5 are enough to unseal vault. The root token is used to login into vault. Only after logging in, you can start using vault. Store these in a safe place for later use.
+
+Start the unsealing process by running the command:
+  ```sh
+      $ vault operator unseal
+  ```
+Vault will ask you for an unseal key. Provide any one of the above 5. Run this command two more times and provide two other keys. Vault should be unsealed now. To verify run the following command:
+
+  ```sh
+      $ vault status
+  ```
+The output should be something like this
+
+  ```
+    Key             Value
+    ---             -----
+    Seal Type       shamir
+    Sealed          false <----this
+    Total Shares    5
+    Threshold       3
+    Version         0.11.0
+    Cluster Name    vault-cluster-8dea58da
+    Cluster ID      8ac011b1-a830-663f-715a-cf5b3f87ae54
+    HA Enabled      false
+  ```
+If you see the sealed key to have value false, vault is unsealed.
+
+Now it's time to login as the root admin. Run the command:
+
+  ```sh
+      $ vault login 85de6efd-d036-9f0d-1c64-5e18e63adee9
+  ```
+Provide your `root-token` in the above command and you should be logged in to vault as admin. Now we can send requests to vault and set-up our plugin.
+
+## Enable plugin
+
+- Calculate the SHA256 of the plugin and register it in Vault's plugin catalog.
+
+  ```sh
+    $ export SHA256=$(shasum -a 256 "/etc/vault/plugins/Vault" | cut -d' ' -f1)
+
+    $ vault write sys/plugins/catalog/secrets-api \
         sha_256="${SHA256}" \
-        command="vault-secrets-gen"
-    ```
+        command="Vault"
+  ```
 
-1. Mount the secrets engine:
+- Mount the secrets engine  
 
-    ```sh
-    $ vault secrets enable \
-        -path="gen" \
-        -plugin-name="secrets-gen" \
-        plugin
-    ```
+  ```sh
+    vault secrets enable \
+    -path="api" \
+    -plugin-name="secrets-api" \
+    plugin
+  ```
 
-## Usage & API
+## Creating policies for application server
 
-### Generate Password
+We need to define policies for the application server that will be using our vault. We don't want our application server to have complete root access of vault, rather, it should just have the capability to update our Vault api plugin that we just enabled. For that, we need to create another .hcl file (application.hcl as an example) to define the policies.
 
-Generates a random, high-entropy password with the specified number of
-characters, digits, symbols, and configurables.
+  ```
+    application.hcl:-
+
+    path "api/*"
+    {
+      capabilities = ["read", "update"]
+    }
+  ```
+
+To register this policy in vault, open terminal in the directory containing application.hcl and run the following command:
+
+  ```sh
+    vault policy write application application.hcl
+  ```
+
+Now we can use application policy to define access capabilities of anyone using vault. More on that later.
+
+## Enable userpass authentication method
+
+We want our application server to login into vault using a particular `username` and `password` and should have access capabilities defined by the `application` policy we created earlier. In order to do this we will be enabling userpass authentication method. 
+
+  ```sh
+    vault auth enable userpass
+  ```
+
+We then create an username and password using which our application server will login. We also attach the application policy in this command. The following command creates an user with username-"appserver" and password-"secret" with application policy attached:
+
+  ```sh
+    vault write auth/userpass/users/appserver password=secret policies=application
+  ```
+We then give these credentials to the application server, who will use this username and password to login into vault. Note that anyone logged in by this method will have capabilities defined by the application policy. 
+
+## Login as application server
+
+Log-in into vault as application server using the following command:
+
+  ```sh
+    vault login -method=userpass username=appserver1 password=secret
+  ```
+The command will return a token which will be used to keep the application server authenticated.
+
+## Plugin Usage
+Once we are logged in as application server, we can use our api plugin to store mnemonic of HD wallet keys and also to sign raw transactions using those keys. 
+
+### Register user
+Registers an user and stores the corresponding user's mnemonic in the vault. The request returns an unique id(uuid) of the user which will be later used to access the user's keys stored in vault. 
 
 | Method   | Path                         | Produces                 |
 | :------- | :--------------------------- | :----------------------- |
-| `POST`   | `/gen/password`              | `200 (application/json)` |
+| `POST`   | `/api/register`              | `200 (application/json)` |
 
 #### Parameters
 
-- `length` `(int: 64)` - Specifies the total length of the password including
-  all letters, digits, and symbols.
+- `username` `(string)` `optional` - Specifies the user-name of the user being registered.
 
-- `digits` `(int: 10)` - Specifies the number of digits to include in the
-  password.
+- `mnemonic` `(string)` `optional` - Specifies the mnemonic to be stored. If not provided, a random mnemonic will be generated and stored.
 
-- `symbols` `(int: 10)` - Specifies the number of symbols to include in the
-  password.
-
-- `allow_uppercase` `(bool: true)` - Specifies whether to allow uppercase and
-  lowercase letters in the password.
-
-- `allow_repeat` `(bool: true)` - Specifies to allow duplicate characters in the
-  password. If set to false, be conscious of password length as values cannot be
-  re-used.
+- `passphrase` `(string)` `optional` - Specifies the passphrase.
 
 #### CLI
 
 ```
-$ vault write gen/password length=36 symbols=0
-Key  	Value
----  	-----
-value	27f3L5zKCZS8DD6D2PEK1xm0ECNaImg1PJqg
+  $ vault write api/register username=user
+
+  Key     Value
+  ---     -----
+  uuid    c3f394de-919d-4a66-a1b3-7686642be430
+
 ```
+### Create signature
 
-### Generate Passphrase
-
-Generates a random, high-entropy passphrase with the specified number of words
-and separator using the diceware algorithm.
+Once an user is registered, we can now sign raw transactions just by using the user's uuid(which accesses the stored keys). As of now Bitcoin, Bitcoin Testnet and Ethereum transactions are supported.
 
 | Method   | Path                         | Produces                 |
 | :------- | :--------------------------- | :----------------------- |
-| `POST`   | `/gen/passphrase`            | `200 (application/json)` |
+| `POST`   | `/api/signature`             | `200 (application/json)` |
 
 #### Parameters
 
-- `words` `(int: 6)` - Specifies the total number of words to generate.
+- `uuid` `(string)` `required` - Specifies the uuid of the user who will sign a transaction.
 
-- `separator` `(string: "-")` - Specifies the string value to use as a separator
-  between words.
+- `path` `(string)` `required` - Specifies the HD-wallet path.
+
+- `coinType` `(uint16)` `required` - Specifies the coin-type Value of the coin to be used. 
+
+- `payload` `(string)` `required` - Contains the raw transaction to be signed in JSON format.
+
+#### coinType
+```
+  - Bitcoin:0
+  - Bitcoin Testnet:1
+  - Ethereum:60
+```
+#### Payload
+
+Since payload contains the raw transaction, it's structure differs for Bitcoin and ethereum.
+
+##### Bitcoin
+
+```
+  {
+    inputs: [] of {txhash: string, vout: uint32}
+    outputs: [] of {address: string, amount: int 64}
+  }
+```
+- txhash refers to the txid containing the UTXO and vout points to the index of that UTXO.
+- address refers to the payee address and amount refers to the amount of BTC you wan't to send.
+
+Example payload:
+
+```
+  {
+    "inputs":[{
+        "txhash":"81b4c832d70cb56ff957589752eb412a4cab78a25a8fc52d6a09e5bd4404d48a", 
+        "vout":0
+      },{ 
+          "txhash":"9dd5264b09bd4aebc1d74b776e6669ba3f0e381ef2992c9434e4d0bee3068edb",
+          "vout":0
+        }],
+    
+    "outputs":[{
+        "address":"1KKKK6N21XKo48zWKuQKXdvSsCf95ibHFa",
+        "amount":91234
+      },{
+          "address":"1HPvK7CAYeHzCdBMBkuXeEsXdvX64yMkoE",
+          "amount":91234
+        }]
+  }
+
+```
+
+##### Ethereum 
+
+```
+  {
+    Nonce : uint64
+    Value: uint64   
+    GasLimit: uint64
+    GasPrice: uint64
+    To: string      
+    Data: string    
+    ChainID: int64 
+  }
+  
+```
+Example payload: 
+
+```
+  {
+    "nonce":0,
+    "value":1000000000,
+    "gasLimit":21000,
+    "gasPrice":30000000000,
+    "to":"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d",
+    "data":"",
+    "chainId":1
+  }
+```
+
+The request finally returns a signed transaction signed using the user's uuid, mnemonic, HD wallet path.
 
 #### CLI
 
+BTC:
+
 ```
-$ vault write gen/passphrase words=4
-Key  	Value
----  	-----
-value	obstacle-sacrament-sizable-variably
+  $ vault write api/signature uuid="c3f394de-919d-4a66-a1b3-7686642be430" \
+    path="m/44'/0'/0'/0/0" \
+    payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" \
+    coinType=0
+
+  Key          Value
+  ---          -----
+  signature    01000000017467b1085498de1b1ef408e65ba5a49210df2bd8660260416d193b69ff9516b3000000006a47304402200cd2c06db98cb1a71cbb7558506815d20933e4451ffda2760971b5e477c7766902206dc6aa33f3c05305a992fcf3f19d58953b55398f8052a0ae1f061ad8b38b3135012103e1a150d41f5d6871da8310e5ea8226f105716639483e3e2c79981d65392ce499ffffffff01626401000000000017a9146916ea9f8135de454ecb1c22ade111ff48fb7c9f8700000000
+
+```
+ETH:
+
+```
+  $ vault write api/signature uuid="c3f394de-919d-4a66-a1b3-7686642be430" \
+  path="m/44'/60'/0'/0/0" \
+  payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" \
+  coinType=60
+
+  Key          Value
+  ---          -----
+  signature    0xf868808506fc23ac00825208944592d8f8d7b001e72cb26a73e4fa1806a51ac79
 ```
 
-## License
 
-This code is licensed under the MIT license.
+
+
+
+
+
