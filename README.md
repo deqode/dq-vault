@@ -1,4 +1,18 @@
 ## Introduction
+
+This vault plugin stores an user's mnemonic inside vault in an encrypted manner. The plugin uses this stored mnemonic to derive a private key based on a HD wallet path provided by the user and signs a raw transaction given as input using that private key. All this process happens inside the vault and the user never knows the mnemonic(unless he has provided it manually) or the private key derived. All he needs to do is give a raw transaction as input and the vault returns a signed transaction. A particular user is identified in vault using an uuid generated when the user is initially registered in vault. 
+
+There will be two roles communicating with vault:
+
+1. Admin: The one who sets up vault.  
+2. Application Server: The one who uses vault to read and update data.
+
+This readme guides you through two things:-
+1. How to set up the vault server (For Admin)
+2. How to use vault to register user and create signature on demand (for application server)
+
+# PART 1:- SETTING UP VAULT
+
 ## Vault installation
 
 First thing you need to do is to install vault to set-up a vault server. 
@@ -53,14 +67,35 @@ Now move this binary file to a directory which the vault will use as its plugin 
 
 ## Set up postgres
 
+Assuming that you have postgreSQL installed in your system, you need to create a table which will be used by Vault to store it's encrypted data. 
+
+Once you are into PostgreSQL shell prompt, run the following commands to create a table:
+
+  ```sh
+
+    postgres=# create database vault;
+
+    postgres=# \c vault
+    
+    vault=# CREATE TABLE vault_kv_store (
+    parent_path TEXT COLLATE "C" NOT NULL,
+    path        TEXT COLLATE "C",
+    key         TEXT COLLATE "C",
+    value       BYTEA,
+    CONSTRAINT pkey PRIMARY KEY (path,key)
+    );
+
+    vault=# CREATE INDEX parent_path_idx ON vault_kv_store (parent_path);
+  ```
+
+
 ## Populate config file
 This is the step where we define the vault configurations. Vault supports .hcl files to write your configurations and set-up vault accordingly. 
 
 Given below is an example of a config.hcl file:
 
+config.hcl-
  ```
-  config.hcl:-
-
   "api_addr" = "http://127.0.0.1:8200"
 
   storage "postgresql" {
@@ -155,9 +190,8 @@ Provide your `root-token` in the above command and you should be logged in to va
 
 We need to define policies for the application server that will be using our vault. We don't want our application server to have complete root access of vault, rather, it should just have the capability to update our Vault api plugin that we just enabled. For that, we need to create another .hcl file (application.hcl as an example) to define the policies.
 
+application.hcl:-
   ```
-    application.hcl:-
-
     path "api/*"
     {
       capabilities = ["read", "update"]
@@ -187,13 +221,25 @@ We then create an username and password using which our application server will 
   ```
 We then give these credentials to the application server, who will use this username and password to login into vault. Note that anyone logged in by this method will have capabilities defined by the application policy. 
 
+#PART 2:- USING VAULT
+
 ## Login as application server
 
 Log-in into vault as application server using the following command:
 
   ```sh
-    vault login -method=userpass username=appserver1 password=secret
+    vault login -method=userpass username=appserver password=secret
   ```
+
+API call
+
+  ```sh
+    curl \
+    --request POST \
+    --data '{"password": "secret"}' \
+    http://127.0.0.1:8200/v1/auth/userpass/login/appserver
+  ```
+
 The command will return a token which will be used to keep the application server authenticated.
 
 ## Plugin Usage
@@ -224,6 +270,41 @@ Registers an user and stores the corresponding user's mnemonic in the vault. The
   uuid    c3f394de-919d-4a66-a1b3-7686642be430
 
 ```
+
+#### API call
+```
+  $ cat payload.json
+  {
+    "username": "user",
+    "mnemonic": "",
+    "passphrase": ""
+  }  
+
+  $ curl \
+    --header "X-Vault-Token: ..." \
+    --request POST \
+    --data @payload.json \
+    http://127.0.0.1:8200/v1/api/register
+```
+
+**The X-Vault-Token being passed in the header is the token recieved when the application server logged in. For API calls, the token has to be always passed in the header for authentication.**
+
+```
+  Response: 
+
+  {
+    "request_id":"03cf1ec0-dbd3-9ce8-1663-067e91d680ab",
+    "lease_id":"",
+    "renewable":false,"lease_duration":0,
+    "data":{
+      "uuid":"9af93fcc-c41f-4c30-828f-c4b774573205"
+      },
+    "wrap_info":null,
+    "warnings":null,
+    "auth":null
+  }
+```
+
 ### Create signature
 
 Once an user is registered, we can now sign raw transactions just by using the user's uuid(which accesses the stored keys). As of now Bitcoin, Bitcoin Testnet and Ethereum transactions are supported.
@@ -322,7 +403,7 @@ BTC:
 
 ```
   $ vault write api/signature uuid="c3f394de-919d-4a66-a1b3-7686642be430" \
-    path="m/44'/0'/0'/0/0" \
+    path="m/0/0" \
     payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" \
     coinType=0
 
@@ -331,20 +412,140 @@ BTC:
   signature    01000000017467b1085498de1b1ef408e65ba5a49210df2bd8660260416d193b69ff9516b3000000006a47304402200cd2c06db98cb1a71cbb7558506815d20933e4451ffda2760971b5e477c7766902206dc6aa33f3c05305a992fcf3f19d58953b55398f8052a0ae1f061ad8b38b3135012103e1a150d41f5d6871da8310e5ea8226f105716639483e3e2c79981d65392ce499ffffffff01626401000000000017a9146916ea9f8135de454ecb1c22ade111ff48fb7c9f8700000000
 
 ```
+BTC testnet:
+
+```
+  $ vault write api/signature uuid="c3f394de-919d-4a66-a1b3-7686642be430" \
+    path="m/0/0" \
+    payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" \
+    coinType=1
+
+  Key          Value
+  ---          -----
+  signature    01000000017467b1085498de1b1ef408e65ba5a49210df2bd8660260416d193b69ff9516b3000000006b483045022100d3323c41f117c4c1ef3e52fde37bc01b24fc6090de8dbeb6918a494bfea21ef602206ee496d9933eb5a9246808b96cbad4c8b84b9b5ad7a66afe045acc72f033e2d6012103c023b44933371f7d208bc0ff8a65505d67bf8750de913d21af8d194585ac7af0ffffffff01626401000000000017a9146916ea9f8135de454ecb1c22ade111ff48fb7c9f8700000000
+
+```
+
 ETH:
 
 ```
   $ vault write api/signature uuid="c3f394de-919d-4a66-a1b3-7686642be430" \
-  path="m/44'/60'/0'/0/0" \
+  path="m/0/0" \
   payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" \
   coinType=60
 
   Key          Value
   ---          -----
-  signature    0xf868808506fc23ac00825208944592d8f8d7b001e72cb26a73e4fa1806a51ac79
+  signature    0xf868808506fc23ac00825208944592d8f8d7b001e72cb26a73e4fa1806a51ac79d843b9aca008026a08a465e9d1c707d02f72360ab21d1a1be5faf84671413e7df0402e954a666cd79a04ab6481295d13f31fc4265888e8bd9962e200062889f162b320caf4c697f96c4
+```
+
+#### API call
+
+BTC: 
+
+```
+  $ cat payload.json
+  {
+    "uuid": "9af93fcc-c41f-4c30-828f-c4b774573205",
+    "path": "m/0/0",
+    "payload": "{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}",
+    "coinType": 0
+  }  
+
+  $ curl \
+    --header "X-Vault-Token: ..." \
+    --request POST \
+    --data @payload.json \
+    http://127.0.0.1:8200/v1/api/signature
+```
+
+```
+  Response:
+
+  {
+    "request_id":"c9f6916d-5985-6320-770b-cc3fb22b0b37",
+    "lease_id":"",
+    "renewable":false,
+    "lease_duration":0,
+    "data":{
+      "signature":"01000000017467b1085498de1b1ef408e65ba5a49210df2bd8660260416d193b69ff9516b3000000006a47304402204355e8a9cd9f2e4cac867c8ab55a63f020404249051385f4170788b35d246d9602201b2ff4bbc7a9dd9eb5ebbfcffeed3de0a9138ca1606d302b407d3e99c092ac1e0121027276b9edee40a02957f237d79536205524c3864d0d351909cdf519adc60de6d4ffffffff01626401000000000017a9146916ea9f8135de454ecb1c22ade111ff48fb7c9f8700000000"
+      },
+    "wrap_info":null,
+    "warnings":null,
+    "auth":null
+  }
+```
+
+BTC Testenet:
+
+```
+  $ cat payload.json
+  {
+    "uuid": "9af93fcc-c41f-4c30-828f-c4b774573205",
+    "path": "m/0/0",
+    "payload": "{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}",
+    "coinType": 1
+  }  
+
+  $ curl \
+    --header "X-Vault-Token: ..." \
+    --request POST \
+    --data @payload.json \
+    http://127.0.0.1:8200/v1/api/signature
+```
+
+```
+  Response:
+
+  {
+    "request_id":"c9f6916d-5985-6320-770b-cc3fb22b0b37",
+    "lease_id":"",
+    "renewable":false,
+    "lease_duration":0,
+    "data":{
+      "signature":"01000000017467b1085498de1b1ef408e65ba5a49210df2bd8660260416d193b69ff9516b3000000006b483045022100d3323c41f117c4c1ef3e52fde37bc01b24fc6090de8dbeb6918a494bfea21ef602206ee496d9933eb5a9246808b96cbad4c8b84b9b5ad7a66afe045acc72f033e2d6012103c023b44933371f7d208bc0ff8a65505d67bf8750de913d21af8d194585ac7af0ffffffff01626401000000000017a9146916ea9f8135de454ecb1c22ade111ff48fb7c9f8700000000"
+      },
+    "wrap_info":null,
+    "warnings":null,
+    "auth":null
+  }
 ```
 
 
+ETH:
+
+```
+  $ cat payload.json
+  {
+    "uuid": "9af93fcc-c41f-4c30-828f-c4b774573205",
+    "path": "m/0/0",
+    "payload": "{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}",
+    "coinType": 60
+  }  
+
+  $ curl \
+    --header "X-Vault-Token: ..." \
+    --request POST \
+    --data @payload.json \
+    http://127.0.0.1:8200/v1/api/signature
+```
+
+```
+  Response:
+
+  {
+    "request_id":"c9f6916d-5985-6320-770b-cc3fb22b0b37",
+    "lease_id":"",
+    "renewable":false,
+    "lease_duration":0,
+    "data":{
+      "signature":"0xf868808506fc23ac00825208944592d8f8d7b001e72cb26a73e4fa1806a51ac79d843b9aca008026a08a465e9d1c707d02f72360ab21d1a1be5faf84671413e7df0402e954a666cd79a04ab6481295d13f31fc4265888e8bd9962e200062889f162b320caf4c697f96c4"
+      },
+    "wrap_info":null,
+    "warnings":null,
+    "auth":null
+  }
+```
 
 
 
