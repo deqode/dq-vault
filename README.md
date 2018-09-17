@@ -221,7 +221,7 @@ We then create an username and password using which our application server will 
   ```
 We then give these credentials to the application server, who will use this username and password to login into vault. Note that anyone logged in by this method will have capabilities defined by the application policy. 
 
-#PART 2:- USING VAULT
+# PART 2:- USING VAULT
 
 ## Login as application server
 
