@@ -11,6 +11,8 @@ This readme guides you through two things:-
 1. How to set up the vault server (For Admin)
 2. How to use vault to register user and create signature on demand (for application server)
 
+Application server can communicate with a vault server using API requests/calls. Both CLI commands and API call methods have been included in this guide. 
+
 # PART 1:- SETTING UP VAULT
 
 ## Vault installation
@@ -72,7 +74,6 @@ Assuming that you have postgreSQL installed in your system, you need to create a
 Once you are into PostgreSQL shell prompt, run the following commands to create a table:
 
   ```
-
     postgres=# create database vault;
 
     postgres=# \c vault
@@ -125,7 +126,7 @@ Once you have created the config.hcl configuration file, we can now start our va
   ```
 Now that the vault server is up and running, it is actually in a sealed state, that is vault functionalities can't be accessed yet. To access vault we need to unseal it. First, open another terminal window and initialize vault by running the following commands:
 
-  ```
+  ```sh
       $ export VAULT_ADDR='http://127.0.0.1:8200' 
 
       $ vault operator init
@@ -180,10 +181,10 @@ Provide your `root-token` in the above command and you should be logged in to va
 - Mount the secrets engine  
 
   ```sh
-    vault secrets enable \
-    -path="api" \
-    -plugin-name="secrets-api" \
-    plugin
+    $ vault secrets enable \
+      -path="api" \
+      -plugin-name="secrets-api" \
+      plugin
   ```
 
 ## Creating policies for application server
@@ -201,7 +202,7 @@ application.hcl:-
 To register this policy in vault, open terminal in the directory containing application.hcl and run the following command:
 
   ```sh
-    vault policy write application application.hcl
+    $ vault policy write application application.hcl
   ```
 
 Now we can use application policy to define access capabilities of anyone using vault. More on that later.
@@ -211,13 +212,13 @@ Now we can use application policy to define access capabilities of anyone using 
 We want our application server to login into vault using a particular `username` and `password` and should have access capabilities defined by the `application` policy we created earlier. In order to do this we will be enabling userpass authentication method. 
 
   ```sh
-    vault auth enable userpass
+    $ vault auth enable userpass
   ```
 
 We then create an username and password using which our application server will login. We also attach the application policy in this command. The following command creates an user with username-"appserver" and password-"secret" with application policy attached:
 
   ```sh
-    vault write auth/userpass/users/appserver password=secret policies=application
+    $ vault write auth/userpass/users/appserver password=secret policies=application
   ```
 We then give these credentials to the application server, who will use this username and password to login into vault. Note that anyone logged in by this method will have capabilities defined by the application policy. 
 
@@ -228,16 +229,16 @@ We then give these credentials to the application server, who will use this user
 Log-in into vault as application server using the following command:
 
   ```sh
-    vault login -method=userpass username=appserver password=secret
+    $ vault login -method=userpass username=appserver password=secret
   ```
 
 API call
 
   ```sh
-    curl \
-    --request POST \
-    --data '{"password": "secret"}' \
-    http://127.0.0.1:8200/v1/auth/userpass/login/appserver
+    $ curl \
+      --request POST \
+      --data '{"password": "secret"}' \
+      http://127.0.0.1:8200/v1/auth/userpass/login/appserver
   ```
 
 The command will return a token which will be used to keep the application server authenticated.
@@ -262,7 +263,7 @@ Registers an user and stores the corresponding user's mnemonic in the vault. The
 
 #### CLI
 
-```
+```sh
   $ vault write api/register username=user
 
   Key     Value
@@ -401,7 +402,7 @@ The request finally returns a signed transaction signed using the user's uuid, m
 
 BTC:
 
-```
+```sh
   $ vault write api/signature uuid="c3f394de-919d-4a66-a1b3-7686642be430" \
     path="m/0/0" \
     payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" \
@@ -414,7 +415,7 @@ BTC:
 ```
 BTC testnet:
 
-```
+```sh
   $ vault write api/signature uuid="c3f394de-919d-4a66-a1b3-7686642be430" \
     path="m/0/0" \
     payload="{\"inputs\":[{\"txhash\":\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\",\"vout\":0}],\"outputs\":[{\"address\":\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\",\"amount\":91234}]}" \
@@ -428,7 +429,7 @@ BTC testnet:
 
 ETH:
 
-```
+```sh
   $ vault write api/signature uuid="c3f394de-919d-4a66-a1b3-7686642be430" \
   path="m/0/0" \
   payload="{\"nonce\":0,\"value\":1000000000,\"gasLimit\":21000,\"gasPrice\":30000000000,\"to\":\"0x4592d8f8d7b001e72cb26a73e4fa1806a51ac79d\",\"data\":\"\",\"chainId\":1}" \
@@ -443,7 +444,7 @@ ETH:
 
 BTC: 
 
-```
+```sh
   $ cat payload.json
   {
     "uuid": "9af93fcc-c41f-4c30-828f-c4b774573205",
@@ -478,7 +479,7 @@ BTC:
 
 BTC Testenet:
 
-```
+```sh
   $ cat payload.json
   {
     "uuid": "9af93fcc-c41f-4c30-828f-c4b774573205",
@@ -514,7 +515,7 @@ BTC Testenet:
 
 ETH:
 
-```
+```sh
   $ cat payload.json
   {
     "uuid": "9af93fcc-c41f-4c30-828f-c4b774573205",
