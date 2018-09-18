@@ -39,6 +39,9 @@ func DerivePrivateKey(seed []byte, path string, isDev bool) (*btcec.PrivateKey, 
 
 	// parse derivation path
 	deriavtionPath, err := parseDerivationPath(path)
+	if err != nil {
+		return nil, err
+	}
 
 	// derive master node
 	key, err := hdkeychain.NewMaster(seed, network)

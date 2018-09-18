@@ -112,10 +112,10 @@ config.hcl-
   "plugin_directory" = "/etc/vault/plugins"
  ```
 
-- api_addr defines the access port of vault. All the requests to vault will be done via this port.
-- Storage defines the backend-storage type that vault will use to store all the encrypted data. Since this backend-storage is not a part of vault, we define the access port of postgreSQL server and the table name which is already created. Change the role, password, databaseName and tableName according to your postgres parameters. Note that we have disabled SSL for database requests.
-- In the listener part we have disabled TLS. If activated, TLS certificates and keys have to be provided here also. The example above listens on localhost port 8200 without TLS.
-- Lastly we have defined the plugin directory where the vault looks for plugins. Remember to change this according to your desired path where you stored the Vault bin file earlier.
+- `api_addr` defines the access port of vault. All the requests to vault will be done via this port.
+- `Storage` defines the backend-storage type that vault will use to store all the encrypted data. Since this backend-storage is not a part of vault, we define the access port of postgreSQL server and the table name which is already created. Change the role, password, databaseName and tableName according to your postgres parameters. Note that we have disabled SSL for database requests.
+- In the `listener` part we have disabled TLS. If activated, TLS certificates and keys have to be provided here also. The example above listens on localhost port 8200 without TLS.
+- Lastly we have defined the `plugin directory` where the vault looks for plugins. Remember to change this according to your desired path where you stored the Vault bin file earlier.
 
 ## Vault Setup
 
@@ -221,6 +221,8 @@ We then create an username and password using which our application server will 
     $ vault write auth/userpass/users/appserver password=secret policies=application
   ```
 We then give these credentials to the application server, who will use this username and password to login into vault. Note that anyone logged in by this method will have capabilities defined by the application policy. 
+
+We can easily create multiple user login credentials for different application servers.
 
 # PART 2:- USING VAULT
 
@@ -396,7 +398,11 @@ Example payload:
   }
 ```
 
-The request finally returns a signed transaction signed using the user's uuid, mnemonic, HD wallet path.
+The request finally returns a signature of a the raw transaction which was signed inside vault using the the following things:
+
+- uuid of the user proposing the transaction.
+- Stored mnenomic corresponding to the provided uuid.
+- HD wallet path.
 
 #### CLI
 

@@ -79,6 +79,10 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 
 	// Generates and stores ECDSA private key in adapter
 	_, err = adapter.DerivePrivateKey(backendLogger)
+	if err != nil {
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
+		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
+	}
 
 	// creates signature from raw transaction payload
 	txHex, err := adapter.CreateSignedTransaction(rawTransaction, backendLogger)
