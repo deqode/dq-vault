@@ -576,6 +576,9 @@ ETH:
   }
 ```
 
+cURL requests for all of the above commands can be imported to postman via vault_postman_collection.json.  
+
+Note: If using postman, replace the existing token with yours in the header section of each request.
 
 
 
