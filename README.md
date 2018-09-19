@@ -1,27 +1,38 @@
+# Hashicorp Vault Secrets Plugin
+
 ## Introduction
 
-This vault plugin stores an user's mnemonic inside vault in an encrypted manner. The plugin uses this stored mnemonic to derive a private key based on a HD wallet path provided by the user and signs a raw transaction given as input using that private key. All this process happens inside the vault and the user never knows the mnemonic(unless he has provided it manually) or the private key derived. All he needs to do is give a raw transaction as input and the vault returns a signed transaction. A particular user is identified in vault using an uuid generated when the user is initially registered in vault. 
+This vault plugin stores a user's mnemonic inside vault in an encrypted manner. The plugin uses this stored mnemonic to derive a private key based on an HD wallet path provided by the user and signs a raw transaction given as input using that private key. All this process happens inside the vault and the user never knows the mnemonic (unless he has provided it manually) or the private key derived. All he needs to do is give a raw transaction as input and the vault returns a signed transaction. A particular user is identified in the vault using a UUID generated when the user is initially registered in the vault. 
 
 There will be two roles communicating with vault:
 
-1. Admin: The one who sets up vault.  
+1. Admin: The one who sets up the vault.  
 2. Application Server: The one who uses vault to read and update data.
 
-This readme guides you through two things:-
+This readme guides you through two processes:-
 1. How to set up the vault server (For Admin)
-2. How to use vault to register user and create signature on demand (for application server)
+2. How to use vault to register a user and create a signature on demand (for application server)
 
-Application server can communicate with a vault server using API requests/calls. Both CLI commands and API call methods have been included in this guide. 
+The application server can communicate with a vault server using API requests/calls. Both CLI commands and API call methods have been included in this guide. 
 
 # PART 1:- SETTING UP VAULT
 
+This part of setting up vault can be done using two methods. You may follow any one of your choices.
+
+- ## Method 1:- 
+  Using `Docker` to get your vault server up and running. You can find it in this [link](https://gitlab.com/arout/Vault/blob/master/setup/README.md). We have provided the required docker files in the setup folder.   
+- ## Method 2:- 
+  Setting up Vault manually. The steps are given below in this README, starting from vault installation to creating your own vault server by using the CLI.
+
+**If you are already done with setting up the vault server using method 1, you may go directly to [part 2](https://gitlab.com/arout/Vault/blob/master/README.md#part-2-using-vault) which elaborates the usage of the vault as an application server.**
+
 ## Vault installation
 
-First thing you need to do is to install vault to set-up a vault server. 
+The first thing you need to do is to install vault to set-up a vault server. 
 - To install Vault, find the [appropriate package](https://www.vaultproject.io/downloads.html) for your system and download it. Vault is packaged as a zip archive. 
 - After downloading Vault, unzip the package. Vault runs as a single binary named vault.
-- Copy the vault binary to your `PATH`. In ubuntu, PATH should be the `usr/bin` directory.
-- To verify the installation, type vault in your terminal. You should see help output similar to following:
+- Copy the vault binary to your `PATH`. In Ubuntu, PATH should be the `usr/bin` directory.
+- To verify the installation, type vault in your terminal. You should see help output similar to the following:
 
   ```
     $ vault
@@ -69,7 +80,7 @@ Now move this binary file to a directory which the vault will use as its plugin 
 
 ## Set up postgres
 
-Assuming that you have postgreSQL installed in your system, you need to create a table which will be used by Vault to store it's encrypted data. 
+Assuming that you have PostgreSQL installed in your system, you need to create a table which will be used by Vault to store it's encrypted data. 
 
 Once you are into PostgreSQL shell prompt, run the following commands to create a table:
 
@@ -101,7 +112,7 @@ config.hcl-
 
   storage "postgresql" {
     connection_url = "postgres://role:password@localhost:5432/databaseName?sslmode=disable"
-    table = "tableName"	
+    table = "tableName"    
   }
 
   listener "tcp" {
@@ -113,9 +124,12 @@ config.hcl-
  ```
 
 - `api_addr` defines the access port of vault. All the requests to vault will be done via this port.
-- `Storage` defines the backend-storage type that vault will use to store all the encrypted data. Since this backend-storage is not a part of vault, we define the access port of postgreSQL server and the table name which is already created. Change the role, password, databaseName and tableName according to your postgres parameters. Note that we have disabled SSL for database requests.
+
+- `Storage` defines the backend-storage type that vault will use to store all the encrypted data. Since this backend-storage is not a part of the vault, we define the access port of PostgreSQL server and the table name which is already created. Change the role, password, databaseName, and tableName according to your postgres parameters. **Note that we have disabled SSL for database requests**.
+
 - In the `listener` part we have disabled TLS. If activated, TLS certificates and keys have to be provided here also. The example above listens on localhost port 8200 without TLS.
-- Lastly we have defined the `plugin directory` where the vault looks for plugins. Remember to change this according to your desired path where you stored the Vault bin file earlier.
+
+- Lastly, we have defined the `plugin directory` where the vault looks for plugins. Remember to change this according to your desired path where you stored the Vault bin file earlier.
 
 ## Vault Setup
 
@@ -132,13 +146,13 @@ Now that the vault server is up and running, it is actually in a sealed state, t
       $ vault operator init
   ```
 
-The first command is required for non-TLS mode. The output is a set of 5 shamir keys which have the capability to unseal vault and an initial root token. Here vault is initialized in such a way that any 3 keys out of 5 are enough to unseal vault. The root token is used to login into vault. Only after logging in, you can start using vault. Store these in a safe place for later use.
+The first command is required for non-TLS mode. The output is a set of 5 shamir keys which have the capability to unseal vault and an initial root token. Here vault is initialized in such a way that any 3 keys out of 5 are enough to unseal vault. The root token is used to login into the vault. Only after logging in, you can start using vault. Store these in a safe place for later use.
 
 Start the unsealing process by running the command:
   ```sh
       $ vault operator unseal
   ```
-Vault will ask you for an unseal key. Provide any one of the above 5. Run this command two more times and provide two other keys. Vault should be unsealed now. To verify run the following command:
+The vault will ask you for an unseal key. Provide any one of the above 5. Run this command two more times and provide two other keys. Vault should be unsealed now. To verify run the following command:
 
   ```sh
       $ vault status
@@ -159,7 +173,7 @@ The output should be something like this
   ```
 If you see the sealed key to have value false, vault is unsealed.
 
-Now it's time to login as the root admin. Run the command:
+Now it's time to log in as the root admin. Run the command:
 
   ```sh
       $ vault login 85de6efd-d036-9f0d-1c64-5e18e63adee9
@@ -167,6 +181,12 @@ Now it's time to login as the root admin. Run the command:
 Provide your `root-token` in the above command and you should be logged in to vault as admin. Now we can send requests to vault and set-up our plugin.
 
 ## Enable plugin
+
+- If you previously have enabled this plugin, you need to disable it. 
+
+  ```sh
+    $ vault secrets disable /api
+  ```
 
 - Calculate the SHA256 of the plugin and register it in Vault's plugin catalog.
 
@@ -189,7 +209,7 @@ Provide your `root-token` in the above command and you should be logged in to va
 
 ## Creating policies for application server
 
-We need to define policies for the application server that will be using our vault. We don't want our application server to have complete root access of vault, rather, it should just have the capability to update our Vault api plugin that we just enabled. For that, we need to create another .hcl file (application.hcl as an example) to define the policies.
+We need to define policies for the application server that will be using our vault. We don't want our application server to have complete root access of vault, rather, it should just have the capability to update our Vault API plugin that we just enabled. For that, we need to create another .hcl file (application.hcl as an example) to define the policies.
 
 application.hcl:-
   ```
@@ -215,20 +235,22 @@ We want our application server to login into vault using a particular `username`
     $ vault auth enable userpass
   ```
 
-We then create an username and password using which our application server will login. We also attach the application policy in this command. The following command creates an user with username-"appserver" and password-"secret" with application policy attached:
+We then create a username and password using which our application server will log in. We also attach the application policy in this command. The following command creates a user with username-"appserver" and password-"secret" with application policy attached:
 
   ```sh
     $ vault write auth/userpass/users/appserver password=secret policies=application
   ```
-We then give these credentials to the application server, who will use this username and password to login into vault. Note that anyone logged in by this method will have capabilities defined by the application policy. 
+We then give these credentials to the application server, who will use this username and password to login into the vault. Note that anyone logged in by this method will have capabilities defined by the application policy. 
 
 We can easily create multiple user login credentials for different application servers.
 
 # PART 2:- USING VAULT
 
-## Login as application server
+The following part contains both cURL requests and CLI commands to communicate with vault server. If you have used docker for vault setup, then use cURL requests.
 
-Log-in into vault as application server using the following command:
+## Login as the application server
+
+Log-in into the vault as application server using the following command:
 
   ```sh
     $ vault login -method=userpass username=appserver password=secret
@@ -246,10 +268,10 @@ API call
 The command will return a token which will be used to keep the application server authenticated.
 
 ## Plugin Usage
-Once we are logged in as application server, we can use our api plugin to store mnemonic of HD wallet keys and also to sign raw transactions using those keys. 
+Once we are logged in as an application server, we can use our API plugin to store mnemonic of HD wallet keys and also to sign raw transactions using those keys. 
 
 ### Register user
-Registers an user and stores the corresponding user's mnemonic in the vault. The request returns an unique id(uuid) of the user which will be later used to access the user's keys stored in vault. 
+Registers a user and stores the corresponding user's mnemonic in the vault. The request returns a unique id(UUID) of the user which will be later used to access the user's keys stored in the vault. 
 
 | Method   | Path                         | Produces                 |
 | :------- | :--------------------------- | :----------------------- |
@@ -290,7 +312,7 @@ Registers an user and stores the corresponding user's mnemonic in the vault. The
     http://127.0.0.1:8200/v1/api/register
 ```
 
-**The X-Vault-Token being passed in the header is the token recieved when the application server logged in. For API calls, the token has to be always passed in the header for authentication.**
+**The X-Vault-Token being passed in the header is the token received when the application server logged in. For API calls, the token has to be always passed in the header for authentication.**
 
 ```
   Response: 
@@ -310,7 +332,7 @@ Registers an user and stores the corresponding user's mnemonic in the vault. The
 
 ### Create signature
 
-Once an user is registered, we can now sign raw transactions just by using the user's uuid(which accesses the stored keys). As of now Bitcoin, Bitcoin Testnet and Ethereum transactions are supported.
+Once a user is registered, we can now sign raw transactions just by using the user's UUID(which accesses the stored keys). As of now Bitcoin, Bitcoin Testnet and Ethereum transactions are supported.
 
 | Method   | Path                         | Produces                 |
 | :------- | :--------------------------- | :----------------------- |
@@ -345,7 +367,7 @@ Since payload contains the raw transaction, it's structure differs for Bitcoin a
   }
 ```
 - txhash refers to the txid containing the UTXO and vout points to the index of that UTXO.
-- address refers to the payee address and amount refers to the amount of BTC you wan't to send.
+- address refers to the payee address and amount refers to the amount of BTC you want to send.
 
 Example payload:
 
@@ -398,10 +420,10 @@ Example payload:
   }
 ```
 
-The request finally returns a signature of a the raw transaction which was signed inside vault using the the following things:
+The request finally returns a signature of a raw transaction which was signed inside vault using the following things:
 
 - uuid of the user proposing the transaction.
-- Stored mnenomic corresponding to the provided uuid.
+- Stored mnemonic corresponding to the provided uuid.
 - HD wallet path.
 
 #### CLI
@@ -483,7 +505,7 @@ BTC:
   }
 ```
 
-BTC Testenet:
+BTC Testnet:
 
 ```sh
   $ cat payload.json
