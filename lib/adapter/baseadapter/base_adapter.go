@@ -9,6 +9,8 @@ import (
 // contains common methods for all Blockchain Adapter variants
 type IBlockchainAdapter interface {
 	DerivePrivateKey(log.Logger) (string, error)
+	DerivePublicKey(log.Logger) (string, error)
+	DeriveAddress(log.Logger) (string, error)
 	GetBlockchainNetwork() string
 	CreateSignedTransaction(lib.IRawTx, log.Logger) (string, error)
 }

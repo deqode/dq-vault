@@ -94,6 +94,30 @@ Returns randomly generated user UUID
 				},
 			},
 
+			// api/address
+			&framework.Path{
+				Pattern:         "address",
+				HelpSynopsis:    "Generate address of user",
+				HelpDescription: "Generates address from stored mnemonic and passphrase using deviation path",
+				Fields: map[string]*framework.FieldSchema{
+					"uuid": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "UUID of user",
+					},
+					"path": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "Deviation path to address",
+					},
+					"coinType": &framework.FieldSchema{
+						Type:        framework.TypeInt,
+						Description: "Cointype of transaction",
+					},
+				},
+				Callbacks: map[logical.Operation]framework.OperationFunc{
+					logical.UpdateOperation: b.pathAddress,
+				},
+			},
+
 			// api/info
 			&framework.Path{
 				Pattern:      "info",
@@ -114,6 +138,6 @@ get help.
 }
 
 const backendHelp = `
-The API secrets engine serves as API for application server to store user information, 
+The API secrets engine serves as API for application server to store user information,
 and optionally generate signed transaction from raw payload data.
 `

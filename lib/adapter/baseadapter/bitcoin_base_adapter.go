@@ -46,6 +46,58 @@ func (b *BitcoinBaseAdapter) DerivePrivateKey(logger log.Logger) (string, error)
 	return b.PrivateKey, nil
 }
 
+func (b *BitcoinBaseAdapter) DerivePublicKey(logger log.Logger) (string, error) {
+	network := &chaincfg.MainNetParams
+	if b.IsDev {
+		network = &chaincfg.TestNet3Params
+	}
+
+	// obatin private key from seed + derivation path
+	if _, err := b.DerivePrivateKey(logger); err != nil {
+		return "", err
+	}
+
+	// obtain wif from private key
+	wif, err := btcutil.DecodeWIF(b.PrivateKey)
+	if err != nil {
+		return "", err
+	}
+
+	// obtains public key from wif
+	pubKey, err := btcutil.NewAddressPubKey(wif.PrivKey.PubKey().SerializeCompressed(), network)
+	if err != nil {
+		return "", err
+	}
+
+	return pubKey.String(), nil
+}
+
+func (b *BitcoinBaseAdapter) DeriveAddress(logger log.Logger) (string, error) {
+	network := &chaincfg.MainNetParams
+	if b.IsDev {
+		network = &chaincfg.TestNet3Params
+	}
+
+	// obatin private key from seed + derivation path
+	if _, err := b.DerivePrivateKey(logger); err != nil {
+		return "", err
+	}
+
+	// obtain wif from private key
+	wif, err := btcutil.DecodeWIF(b.PrivateKey)
+	if err != nil {
+		return "", err
+	}
+
+	// obtains public key from wif
+	pubKey, err := btcutil.NewAddressPubKey(wif.PrivKey.PubKey().SerializeCompressed(), network)
+	if err != nil {
+		return "", err
+	}
+
+	return pubKey.EncodeAddress(), nil
+}
+
 func (b *BitcoinBaseAdapter) GetBlockchainNetwork() string {
 	if b.IsDev {
 		return "testnet"
@@ -89,7 +141,6 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx, backendLogger
 	//generating sender's address from sender's public key
 	p2pk, _ := btcutil.NewAddressPubKey(pubkey.SerializeCompressed(), network)
 	sourceAddress := p2pk.AddressPubKeyHash().EncodeAddress()
-
 	logger.Log(backendLogger, config.Info, "signature:", "from", sourceAddress)
 
 	transaction := wire.NewMsgTx(wire.TxVersion)

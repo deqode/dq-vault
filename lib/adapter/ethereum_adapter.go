@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"crypto/ecdsa"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -57,6 +58,45 @@ func (e *EthereumAdapter) DerivePrivateKey(backendLogger log.Logger) (string, er
 	e.PrivateKey = privateKeyHex
 
 	return e.PrivateKey, nil
+}
+
+func (e *EthereumAdapter) DerivePublicKey(logger log.Logger) (string, error) {
+	// obatin private key from seed + derivation path
+	if _, err := e.DerivePrivateKey(logger); err != nil {
+		return "", err
+	}
+
+	privateKey, err := crypto.HexToECDSA(e.PrivateKey)
+	if err != nil {
+		return "", err
+	}
+
+	publicKeyECDSA, ok := privateKey.Public().(*ecdsa.PublicKey)
+	if !ok {
+		return "", errors.New("Invalid ECDSA public key")
+	}
+
+	publicKeyBytes := crypto.CompressPubkey(publicKeyECDSA)
+	return hexutil.Encode(publicKeyBytes)[2:], nil
+}
+
+func (e *EthereumAdapter) DeriveAddress(logger log.Logger) (string, error) {
+	// obatin private key from seed + derivation path
+	if _, err := e.DerivePrivateKey(logger); err != nil {
+		return "", err
+	}
+
+	privateKey, err := crypto.HexToECDSA(e.PrivateKey)
+	if err != nil {
+		return "", err
+	}
+
+	publicKeyECDSA, ok := privateKey.Public().(*ecdsa.PublicKey)
+	if !ok {
+		return "", errors.New("Invalid ECDSA public key")
+	}
+
+	return crypto.PubkeyToAddress(*publicKeyECDSA).Hex(), nil
 }
 
 // GetBlockchainNetwork returns network config

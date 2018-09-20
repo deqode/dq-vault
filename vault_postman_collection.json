@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9d9bcdb8-d7a5-40d1-be0f-9fad8264589e",
+		"_postman_id": "4fcbe173-3e5c-47a4-bd31-42ad57c5b06d",
 		"name": "Vault",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -21,7 +21,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\": \"user\",\"mnemonic\": \"\",\"passphrase\": \"\"}"
+					"raw": "{\"username\": \"use111r\",\"mnemonic\": \"minor rival vocal give swear mimic enhance disease fly force deliver dawn detail grief zero\",\"passphrase\": \"\"}"
 				},
 				"url": {
 					"raw": "{{host}}/api/register",
@@ -325,7 +325,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"key\": \"00sNlVhvmhVNRDyxD14mnVr3Qfzt1ytgw00z+s198Sqv\"}"
+					"raw": "{\"key\": \"2DaDtDLmyXfd01eLO78yy27C2wztvIUT1/ZuxPaEG8c=\"}"
 				},
 				"url": {
 					"raw": "{{host}}/sys/unseal",
@@ -492,7 +492,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"sha_256\": \"a7b036df5756a3acecc7d1bbdd1012856f8eb8ad62f638e4a1643521aa0d5d1a\",\"command\": \"Vault\"}"
+					"raw": "{\"sha_256\": \"17506a7ecc30a107ae7089ec74003dfa4993866c6045364605da555568e6be32\",\"command\": \"Vault\"}"
 				},
 				"url": {
 					"raw": "{{host}}/sys/plugins/catalog/secrets-api",
@@ -540,6 +540,38 @@
 					]
 				},
 				"description": "Generated from a curl request: \ncurl -X POST \\\n  http://127.0.0.1:8200/v1/sys/mounts/api \\\n  -H 'content-type: application/json' \\\n  -H 'x-vault-token: bd1c4051-cfc2-b6d4-6547-c0541b74d0bf' \\\n  -d '{\\\"plugin_name\\\":\\\"secrets-api\\\", \\\"type\\\":\\\"plugin\\\"}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Address",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-vault-token",
+						"value": "{{root-token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"coinType\":0,\"path\":\"m/44'/0'/0'/0/0\",\"uuid\":\"214b8190-f9f5-4cf8-a4f1-3874ed5b05d0\"}"
+				},
+				"url": {
+					"raw": "{{host}}/api/address",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"address"
+					]
+				},
+				"description": "Generated from a curl request: \ncurl -X POST \\\n  http://127.0.0.1:8200/v1/api/address \\\n  -H 'content-type: application/json' \\\n  -H 'x-vault-token: 50003a1a-fc75-e057-c921-2fcda158ec05' \\\n  -d '{\\\"coinType\\\":0,\\\"path\\\":\\\"m/44'\\''/0'\\''/0'\\''/0/0\\\",\\\"uuid\\\":\\\"97e6b37c-630e-4ee5-9968-8a7f407e6ce6\\\"}'"
 			},
 			"response": []
 		}
