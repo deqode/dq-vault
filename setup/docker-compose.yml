@@ -1,4 +1,4 @@
-version: '3'
+version: '2.1'
 services:
   database:
     image: postgres:10.5
@@ -12,6 +12,9 @@ services:
   vault:
     build: ./vault_docker
     container_name: vault_docker
+    restart: always
+    depends_on:
+      - database
     ports:
       - 8200:8200
     links:
@@ -22,6 +25,3 @@ services:
       - ./config.hcl:/vault/config/config.hcl
       - ./vault_docker/plugins:/vault/plugins
     command: vault server -config=/vault/config/config.hcl
-  
-
-
