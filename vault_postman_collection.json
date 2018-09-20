@@ -1,53 +1,53 @@
 {
-	"variables": [],
 	"info": {
+		"_postman_id": "9d9bcdb8-d7a5-40d1-be0f-9fad8264589e",
 		"name": "Vault",
-		"_postman_id": "ed9e5496-0a8b-4693-cc6b-783df4eedb42",
-		"description": "",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Register",
 			"request": {
-				"url": "http://127.0.0.1:8200/v1/api/register",
 				"method": "POST",
 				"header": [
 					{
 						"key": "X-Vault-Token",
-						"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-						"description": ""
+						"value": "{{root-token}}"
 					},
 					{
 						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\"username\": \"user\",\"mnemonic\": \"\",\"passphrase\": \"\"}"
 				},
-				"description": ""
+				"url": {
+					"raw": "{{host}}/api/register",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"register"
+					]
+				}
 			},
 			"response": [
 				{
-					"id": "160bcaf2-86a6-4b90-bb35-0c1e3205ae95",
 					"name": "Register",
 					"originalRequest": {
-						"url": "http://127.0.0.1:8200/v1/api/register",
 						"method": "POST",
 						"header": [
 							{
 								"key": "X-Vault-Token",
 								"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-								"description": "",
 								"warning": ""
 							},
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"description": "",
 								"warning": ""
 							}
 						],
@@ -55,40 +55,53 @@
 							"mode": "raw",
 							"raw": "{\"username\": \"user\",\"mnemonic\": \"\",\"passphrase\": \"\"}"
 						},
-						"description": ""
+						"url": {
+							"raw": "http://127.0.0.1:8200/v1/api/register",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8200",
+							"path": [
+								"v1",
+								"api",
+								"register"
+							]
+						}
 					},
 					"status": "OK",
 					"code": 200,
 					"_postman_previewlanguage": "json",
-					"_postman_previewtype": "text",
 					"header": [
 						{
-							"name": "cache-control",
 							"key": "cache-control",
 							"value": "no-store",
+							"name": "cache-control",
 							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
 						},
 						{
-							"name": "content-length",
 							"key": "content-length",
 							"value": "205",
+							"name": "content-length",
 							"description": "The length of the response body in octets (8-bit bytes)"
 						},
 						{
-							"name": "content-type",
 							"key": "content-type",
 							"value": "application/json",
+							"name": "content-type",
 							"description": "The mime type of this content"
 						},
 						{
-							"name": "date",
 							"key": "date",
 							"value": "Wed, 19 Sep 2018 07:58:04 GMT",
+							"name": "date",
 							"description": "The date and time that the message was sent"
 						}
 					],
 					"cookie": [],
-					"responseTime": 77,
 					"body": "{\"request_id\":\"69cce835-044a-def7-4b93-5fe2d7375d1e\",\"lease_id\":\"\",\"renewable\":false,\"lease_duration\":0,\"data\":{\"uuid\":\"43704b7d-58e7-464a-83c0-d57073387b26\"},\"wrap_info\":null,\"warnings\":null,\"auth\":null}\n"
 				}
 			]
@@ -96,84 +109,100 @@
 		{
 			"name": "Signature",
 			"request": {
-				"url": "http://127.0.0.1:8200/v1/api/signature",
 				"method": "POST",
 				"header": [
 					{
 						"key": "X-Vault-Token",
-						"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-						"description": ""
+						"value": "{{root-token}}"
 					},
 					{
 						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"coinType\":0,\"path\":\"m/44'/0'/0'/0/0\",\"payload\":\"{\\\"inputs\\\":[{\\\"txhash\\\":\\\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\\\",\\\"vout\\\":0}],\\\"outputs\\\":[{\\\"address\\\":\\\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\\\",\\\"amount\\\":91234}]}\",\"uuid\":\"40d55277-2276-43bc-8de6-78850d7653ee\"}"
+					"raw": "{\"coinType\":0,\"path\":\"m/44'/0'/0'/0/0\",\"payload\":\"{\\\"inputs\\\":[{\\\"txhash\\\":\\\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\\\",\\\"vout\\\":0}],\\\"outputs\\\":[{\\\"address\\\":\\\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\\\",\\\"amount\\\":91234}]}\",\"uuid\":\"b73916d1-05e7-4be8-8f19-b83e160a005d\"}"
 				},
-				"description": ""
+				"url": {
+					"raw": "{{host}}/api/signature",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"signature"
+					]
+				}
 			},
 			"response": [
 				{
-					"id": "2e579766-4872-49ae-8ef8-703fd4a36374",
 					"name": "Signature",
 					"originalRequest": {
-						"url": "http://127.0.0.1:8200/v1/api/signature",
 						"method": "POST",
 						"header": [
 							{
 								"key": "X-Vault-Token",
 								"value": "11e53801-8741-53cf-22fc-3152de53ea02",
-								"description": "",
 								"warning": ""
 							},
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"description": "",
 								"warning": ""
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\"coinType\":0,\"path\":\"m/44'/0'/0'/0/0\",\"payload\":\"{\\\"inputs\\\":[{\\\"txhash\\\":\\\"b31695ff693b196d41600266d82bdf1092a4a55be608f41e1bde985408b16774\\\",\\\"vout\\\":0}],\\\"outputs\\\":[{\\\"address\\\":\\\"3BGgKxAsqoFyouTgUJGW3TAJdvYrk43Jr5\\\",\\\"amount\\\":91234}]}\",\"uuid\":\"3a09499b-2fe4-43d1-8e61-99fe76138684\"}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8200/v1/api/signature",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8200",
+							"path": [
+								"v1",
+								"api",
+								"signature"
+							]
 						}
 					},
 					"status": "OK",
 					"code": 200,
 					"_postman_previewlanguage": "json",
-					"_postman_previewtype": "text",
 					"header": [
 						{
-							"name": "cache-control",
 							"key": "cache-control",
 							"value": "no-store",
+							"name": "cache-control",
 							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
 						},
 						{
-							"name": "content-length",
 							"key": "content-length",
 							"value": "552",
+							"name": "content-length",
 							"description": "The length of the response body in octets (8-bit bytes)"
 						},
 						{
-							"name": "content-type",
 							"key": "content-type",
 							"value": "application/json",
+							"name": "content-type",
 							"description": "The mime type of this content"
 						},
 						{
-							"name": "date",
 							"key": "date",
 							"value": "Wed, 19 Sep 2018 11:16:58 GMT",
+							"name": "date",
 							"description": "The date and time that the message was sent"
 						}
 					],
 					"cookie": [],
-					"responseTime": 36,
 					"body": "{\"request_id\":\"3c41593c-b819-bdd0-2e5c-ee3968787aed\",\"lease_id\":\"\",\"renewable\":false,\"lease_duration\":0,\"data\":{\"signature\":\"01000000017467b1085498de1b1ef408e65ba5a49210df2bd8660260416d193b69ff9516b3000000006a473044022055bbf04fca9f618ea577d65907d83cbfc5ca55b215bdf21d1bc739b2665b1682022006d7dde1dedec4bbfe5f19290fd5beb286f2370f9078ef85d3cdbff8b6da03c50121024c8f9c49648e90734ae9b8fec69b7e71e8e2c5adf51f3a733e901df07a58108fffffffff01626401000000000017a9146916ea9f8135de454ecb1c22ade111ff48fb7c9f8700000000\"},\"wrap_info\":null,\"warnings\":null,\"auth\":null}\n"
 				}
 			]
@@ -181,82 +210,100 @@
 		{
 			"name": "Init Vault",
 			"request": {
-				"url": "http://127.0.0.1:8200/v1/sys/init",
 				"method": "PUT",
 				"header": [
 					{
 						"key": "content-type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					},
 					{
 						"key": "x-vault-token",
 						"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-						"description": ""
+						"disabled": true
 					}
 				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\"secret_shares\": 1, \"secret_threshold\": 1}"
 				},
+				"url": {
+					"raw": "{{host}}/sys/init",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"sys",
+						"init"
+					]
+				},
 				"description": "Generated from a curl request: \ncurl -X PUT \\\n  http://127.0.0.1:8200/v1/sys/init \\\n  -H 'content-type: application/json' \\\n  -H 'x-vault-token: bd1c4051-cfc2-b6d4-6547-c0541b74d0bf' \\\n  -d '{\\\"secret_shares\\\": 1, \\\"secret_threshold\\\": 1}'"
 			},
 			"response": [
 				{
-					"id": "13ea8716-d2a8-4283-86de-e37fbce81505",
 					"name": "Init Vault",
 					"originalRequest": {
-						"url": "http://127.0.0.1:8200/v1/sys/init",
 						"method": "PUT",
 						"header": [
 							{
 								"key": "content-type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "x-vault-token",
-								"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-								"description": ""
+								"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\"secret_shares\": 1, \"secret_threshold\": 1}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8200/v1/sys/init",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8200",
+							"path": [
+								"v1",
+								"sys",
+								"init"
+							]
 						}
 					},
 					"status": "OK",
 					"code": 200,
 					"_postman_previewlanguage": "json",
-					"_postman_previewtype": "text",
 					"header": [
 						{
-							"name": "cache-control",
 							"key": "cache-control",
 							"value": "no-store",
+							"name": "cache-control",
 							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
 						},
 						{
-							"name": "content-length",
 							"key": "content-length",
 							"value": "193",
+							"name": "content-length",
 							"description": "The length of the response body in octets (8-bit bytes)"
 						},
 						{
-							"name": "content-type",
 							"key": "content-type",
 							"value": "application/json",
+							"name": "content-type",
 							"description": "The mime type of this content"
 						},
 						{
-							"name": "date",
 							"key": "date",
 							"value": "Wed, 19 Sep 2018 11:13:13 GMT",
+							"name": "date",
 							"description": "The date and time that the message was sent"
 						}
 					],
 					"cookie": [],
-					"responseTime": 323,
 					"body": "{\"keys\":[\"2bf6f9c29eb2ba10279f7a3e33fa635f778717bdd6164adb00dd4bd793913f29\"],\"keys_base64\":[\"K/b5wp6yuhAnn3o+M/pjX3eHF73WFkrbAN1L15ORPyk=\"],\"root_token\":\"11e53801-8741-53cf-22fc-3152de53ea02\"}\n"
 				}
 			]
@@ -264,82 +311,100 @@
 		{
 			"name": "Unseal",
 			"request": {
-				"url": "http://127.0.0.1:8200/v1/sys/unseal",
 				"method": "PUT",
 				"header": [
 					{
 						"key": "content-type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					},
 					{
 						"key": "x-vault-token",
 						"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-						"description": ""
+						"disabled": true
 					}
 				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\"key\": \"00sNlVhvmhVNRDyxD14mnVr3Qfzt1ytgw00z+s198Sqv\"}"
 				},
+				"url": {
+					"raw": "{{host}}/sys/unseal",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"sys",
+						"unseal"
+					]
+				},
 				"description": "Generated from a curl request: \ncurl -X PUT \\\n  http://127.0.0.1:8200/v1/sys/unseal \\\n  -H 'content-type: application/json' \\\n  -H 'x-vault-token: bd1c4051-cfc2-b6d4-6547-c0541b74d0bf' \\\n  -d '{\\\"key\\\": \\\"00sNlVhvmhVNRDyxD14mnVr3Qfzt1ytgw00z+s198Sqv\\\"}'"
 			},
 			"response": [
 				{
-					"id": "80c2e842-f3b8-49db-96a5-1126ef3ba182",
 					"name": "Unseal",
 					"originalRequest": {
-						"url": "http://127.0.0.1:8200/v1/sys/unseal",
 						"method": "PUT",
 						"header": [
 							{
 								"key": "content-type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "x-vault-token",
-								"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-								"description": ""
+								"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\"key\": \"K/b5wp6yuhAnn3o+M/pjX3eHF73WFkrbAN1L15ORPyk=\"}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8200/v1/sys/unseal",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8200",
+							"path": [
+								"v1",
+								"sys",
+								"unseal"
+							]
 						}
 					},
 					"status": "OK",
 					"code": 200,
 					"_postman_previewlanguage": "json",
-					"_postman_previewtype": "text",
 					"header": [
 						{
-							"name": "cache-control",
 							"key": "cache-control",
 							"value": "no-store",
+							"name": "cache-control",
 							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
 						},
 						{
-							"name": "content-length",
 							"key": "content-length",
 							"value": "180",
+							"name": "content-length",
 							"description": "The length of the response body in octets (8-bit bytes)"
 						},
 						{
-							"name": "content-type",
 							"key": "content-type",
 							"value": "application/json",
+							"name": "content-type",
 							"description": "The mime type of this content"
 						},
 						{
-							"name": "date",
 							"key": "date",
 							"value": "Wed, 19 Sep 2018 11:14:15 GMT",
+							"name": "date",
 							"description": "The date and time that the message was sent"
 						}
 					],
 					"cookie": [],
-					"responseTime": 40,
 					"body": "{\"type\":\"shamir\",\"sealed\":false,\"t\":1,\"n\":1,\"progress\":0,\"nonce\":\"\",\"version\":\"0.11.1\",\"cluster_name\":\"vault-cluster-5c3cc138\",\"cluster_id\":\"5455f4f9-510b-ab2a-cda0-c2c17ec0014a\"}\n"
 				}
 			]
@@ -347,23 +412,32 @@
 		{
 			"name": "Delete API",
 			"request": {
-				"url": "http://127.0.0.1:8200/v1/sys/plugins/catalog/secrets-api",
 				"method": "DELETE",
 				"header": [
 					{
 						"key": "content-type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					},
 					{
 						"key": "x-vault-token",
-						"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-						"description": ""
+						"value": "{{root-token}}"
 					}
 				],
 				"body": {
 					"mode": "raw",
 					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/sys/plugins/catalog/secrets-api",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"sys",
+						"plugins",
+						"catalog",
+						"secrets-api"
+					]
 				},
 				"description": "Generated from a curl request: \ncurl -X DELETE \\\n  http://127.0.0.1:8200/v1/sys/plugins/catalog/secrets-api \\\n  -H 'content-type: application/json' \\\n  -H 'x-vault-token: bd1c4051-cfc2-b6d4-6547-c0541b74d0bf'"
 			},
@@ -372,23 +446,31 @@
 		{
 			"name": "Disable API",
 			"request": {
-				"url": "http://127.0.0.1:8200/v1/sys/mounts/api",
 				"method": "DELETE",
 				"header": [
 					{
 						"key": "content-type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					},
 					{
 						"key": "x-vault-token",
-						"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-						"description": ""
+						"value": "{{root-token}}"
 					}
 				],
 				"body": {
 					"mode": "raw",
 					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/sys/mounts/api",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"sys",
+						"mounts",
+						"api"
+					]
 				},
 				"description": "Generated from a curl request: \ncurl -X DELETE \\\n  http://127.0.0.1:8200/v1/sys/mounts/api \\\n  -H 'content-type: application/json' \\\n  -H 'x-vault-token: bd1c4051-cfc2-b6d4-6547-c0541b74d0bf'"
 			},
@@ -397,23 +479,32 @@
 		{
 			"name": "Write API",
 			"request": {
-				"url": "http://127.0.0.1:8200/v1/sys/plugins/catalog/secrets-api",
 				"method": "PUT",
 				"header": [
 					{
 						"key": "content-type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					},
 					{
 						"key": "x-vault-token",
-						"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-						"description": ""
+						"value": "{{root-token}}"
 					}
 				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\"sha_256\": \"a7b036df5756a3acecc7d1bbdd1012856f8eb8ad62f638e4a1643521aa0d5d1a\",\"command\": \"Vault\"}"
+				},
+				"url": {
+					"raw": "{{host}}/sys/plugins/catalog/secrets-api",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"sys",
+						"plugins",
+						"catalog",
+						"secrets-api"
+					]
 				},
 				"description": "Generated from a curl request: \ncurl -X PUT \\\n  http://127.0.0.1:8200/v1/sys/plugins/catalog/secrets-api \\\n  -H 'content-type: application/json' \\\n  -H 'x-vault-token: bd1c4051-cfc2-b6d4-6547-c0541b74d0bf' \\\n  -d '{\\\"sha_256\\\": \\\"a7b036df5756a3acecc7d1bbdd1012856f8eb8ad62f638e4a1643521aa0d5d1a\\\",\\\"command\\\": \\\"Vault\\\"}'"
 			},
@@ -422,23 +513,31 @@
 		{
 			"name": "Enable API",
 			"request": {
-				"url": "http://127.0.0.1:8200/v1/sys/mounts/api",
 				"method": "POST",
 				"header": [
 					{
 						"key": "content-type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					},
 					{
 						"key": "x-vault-token",
-						"value": "bd1c4051-cfc2-b6d4-6547-c0541b74d0bf",
-						"description": ""
+						"value": "{{root-token}}"
 					}
 				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\"plugin_name\":\"secrets-api\", \"type\":\"plugin\"}"
+				},
+				"url": {
+					"raw": "{{host}}/sys/mounts/api",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"sys",
+						"mounts",
+						"api"
+					]
 				},
 				"description": "Generated from a curl request: \ncurl -X POST \\\n  http://127.0.0.1:8200/v1/sys/mounts/api \\\n  -H 'content-type: application/json' \\\n  -H 'x-vault-token: bd1c4051-cfc2-b6d4-6547-c0541b74d0bf' \\\n  -d '{\\\"plugin_name\\\":\\\"secrets-api\\\", \\\"type\\\":\\\"plugin\\\"}'"
 			},
