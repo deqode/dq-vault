@@ -330,6 +330,78 @@ Registers a user and stores the corresponding user's mnemonic in the vault. The 
   }
 ```
 
+### Obtain user address and public key 
+
+Once a user is registered, we can obtain the address and public key of that corresponding user.
+
+| Method   | Path                         | Produces                 |
+| :------- | :--------------------------- | :----------------------- |
+| `POST`   | `/api/address`               | `200 (application/json)` |
+
+#### Parameters
+
+- `uuid` `(string)` `required` - Specifies the uuid of the user who will sign a transaction.
+
+- `path` `(string)` `required` - Specifies the HD-wallet path.
+
+- `coinType` `(uint16)` `required` - Specifies the coin-type Value of the coin to be used. 
+
+#### coinType
+```
+  - Bitcoin:0
+  - Bitcoin Testnet:1
+  - Ethereum:60
+```
+
+#### CLI
+
+```sh
+
+  $ vault write api/address uuid="214b8190-f9f5-4cf8-a4f1-3874ed5b05d0" path="m/44'/0'/0'/0/0" coinType=0
+
+  Key          Value
+  ---          -----
+  address      1Ax1vX6dASU35gqyPDzX16np4rifvm8oF2
+  publicKey    030df204bde019cbbe79bec99aecfacd3c5f321f404d2df47b42573c987393df80
+  uuid         214b8190-f9f5-4cf8-a4f1-3874ed5b05d0
+```
+
+#### API call
+
+```sh
+  $ cat payload.json
+  {
+    "uuid": "9af93fcc-c41f-4c30-828f-c4b774573205",
+    "path": "m/44'/0'/0'/0/0",
+    "coinType": 0
+  }  
+
+  $ curl \
+    --header "X-Vault-Token: ..." \
+    --request POST \
+    --data @payload.json \
+    http://127.0.0.1:8200/v1/api/address
+```
+
+```
+  Response:
+
+  {
+    "request_id": "a98b3299-9b03-e730-eae4-6a0f727816aa",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "address": "1Ax1vX6dASU35gqyPDzX16np4rifvm8oF2",
+        "publicKey": "030df204bde019cbbe79bec99aecfacd3c5f321f404d2df47b42573c987393df80",
+        "uuid": "214b8190-f9f5-4cf8-a4f1-3874ed5b05d0"
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+  }
+```
+
 ### Create signature
 
 Once a user is registered, we can now sign raw transactions just by using the user's UUID(which accesses the stored keys). As of now Bitcoin, Bitcoin Testnet and Ethereum transactions are supported.
