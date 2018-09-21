@@ -169,7 +169,7 @@ If you find the sealed attribute to be false, then your vault is unsealed.
     http://127.0.0.1:8200/v1/sys/plugins/catalog/secrets-api \
     -H 'content-type: application/json' \
     -H 'x-vault-token: ...' \
-    -d '{"sha_256": "a7b036df5756a3acecc7d1bbdd1012856f8eb8ad62f638e4a1643521aa0d5d1a","command": "Vault"}'
+    -d '{"sha_256": "17506a7ecc30a107ae7089ec74003dfa4993866c6045364605da555568e6be32","command": "Vault"}'
   ```
 
   Provide your initial root token as the x-vault-token. 
