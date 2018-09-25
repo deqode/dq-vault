@@ -21,7 +21,6 @@ testing.go
 # Local development tmp
 /tmp/
 version
-vendor
 scripts
 .travis.yml
 Gopkg.lock
