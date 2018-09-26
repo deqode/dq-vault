@@ -1,0 +1,26 @@
+version: '2.1'
+services:
+  database:
+    image: postgres:10.5
+    container_name: postgres_docker
+    volumes:
+      - ./setup/postgres_docker:/docker-entrypoint-initdb.d/
+    environment:
+      - POSTGRES_USER=vault
+      - POSTGRES_PASSWORD=vault
+      - POSTGRES_DB=vault
+  vault:
+    build: .
+    container_name: vault_docker
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - 8200:8200
+    links:
+      - database
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./setup/config.hcl:/vault/config/config.hcl
+    command: vault server -config=/vault/config/config.hcl

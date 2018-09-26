@@ -1,0 +1,93 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"path": "github.com/btcsuite/btcd/btcec",
+			"revision": ""
+		},
+		{
+			"path": "github.com/btcsuite/btcd/chaincfg",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "oQgLy8KmIOVov04WXH7KgU1bszc=",
+			"path": "github.com/btcsuite/btcutil/base58",
+			"revision": "ab6388e0c60ae4834a1f57511e20c17b5f78be4b",
+			"revisionTime": "2018-07-06T23:06:48Z"
+		},
+		{
+			"path": "github.com/btcsuite/btcutil/hdkeychain",
+			"revision": ""
+		},
+		{
+			"path": "github.com/ethereum/go-ethereum/core/types",
+			"revision": ""
+		},
+		{
+			"path": "github.com/ethereum/go-ethereum/crypto",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "eDQ6f1EsNf+frcRO/9XukSEchm8=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "36e9d2ebbde5e3f13ab2e25625fd453271d6522e",
+			"revisionTime": "2018-01-03T17:44:51Z"
+		},
+		{
+			"checksumSHA1": "TwXeqVAeWRsw5vd2iKCRno105tI=",
+			"path": "github.com/tyler-smith/go-bip39",
+			"revision": "95c66720ed7ac2f4b78ddb31d940d59193894f49",
+			"revisionTime": "2018-07-16T17:03:10Z"
+		},
+		{
+			"checksumSHA1": "+347vHML6CFl9flxJzDPoHmQA7Y=",
+			"path": "github.com/tyler-smith/go-bip39/wordlists",
+			"revision": "95c66720ed7ac2f4b78ddb31d940d59193894f49",
+			"revisionTime": "2018-07-16T17:03:10Z"
+		},
+		{
+			"path": "gitlab.com/arout/Vault",
+			"revision": ""
+		},
+		{
+			"path": "gitlab.com/arout/Vault/api",
+			"revision": ""
+		},
+		{
+			"path": "gitlab.com/arout/Vault/api/helpers",
+			"revision": ""
+		},
+		{
+			"path": "gitlab.com/arout/Vault/config",
+			"revision": ""
+		},
+		{
+			"path": "gitlab.com/arout/Vault/lib",
+			"revision": ""
+		},
+		{
+			"path": "gitlab.com/arout/Vault/lib/adapter",
+			"revision": ""
+		},
+		{
+			"path": "gitlab.com/arout/Vault/lib/adapter/baseadapter",
+			"revision": ""
+		},
+		{
+			"path": "gitlab.com/arout/Vault/lib/bip44coins",
+			"revision": ""
+		},
+		{
+			"path": "gitlab.com/arout/Vault/logger",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "1MGpGDQqnUoRpv7VEcQrXOBydXE=",
+			"path": "golang.org/x/crypto/pbkdf2",
+			"revision": "0e37d006457bf46f9e6692014ba72ef82c33022c",
+			"revisionTime": "2018-06-14T19:19:50Z"
+		}
+	],
+	"rootPath": "gitlab.com/arout/Vault"
+}
