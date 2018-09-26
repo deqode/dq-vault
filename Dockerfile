@@ -17,6 +17,6 @@ RUN mkdir /vault/plugins && \
   apk add glibc-2.28-r0.apk
 
 # Copy executable from source to vault
-COPY --from=source /go/src/gitlab.com/arout/Vault/Vault /vault/plugins/Vault
+COPY --from=source /go/src/gitlab.com/arout/Vault/Vault /vault/plugins/vault_plugin
 
 # TODO: add make run
