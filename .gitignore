@@ -25,7 +25,6 @@ scripts
 .travis.yml
 Gopkg.lock
 LICENSE
-Makefile
 vault-secrets-gen
 Vault-demo
 vault-secrets-gen

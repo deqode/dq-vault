@@ -10,13 +10,17 @@ RUN go build
 FROM vault:latest
 
 # Make new directory for plugins
-RUN mkdir /vault/plugins && \
-  apk --no-cache add ca-certificates wget && \
-  wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
-  wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.28-r0/glibc-2.28-r0.apk && \
-  apk add glibc-2.28-r0.apk
+RUN mkdir /vault/plugins
+
+RUN apk --no-cache add ca-certificates wget make
+RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
+RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.28-r0/glibc-2.28-r0.apk
+RUN apk add glibc-2.28-r0.apk
+
 
 # Copy executable from source to vault
 COPY --from=source /go/src/gitlab.com/arout/Vault/Vault /vault/plugins/vault_plugin
+COPY ./Makefile .
 
 # TODO: add make run
+CMD ["make", "run"]

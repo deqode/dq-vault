@@ -5,14 +5,11 @@ services:
     container_name: postgres_docker
     volumes:
       - ./setup/postgres_docker:/docker-entrypoint-initdb.d/
-    environment:
-      - POSTGRES_USER=vault
-      - POSTGRES_PASSWORD=vault
-      - POSTGRES_DB=vault
+    env_file:
+      .env
   vault:
     build: .
-    container_name: vault_docker
-    restart: always
+    container_name: vault_plugin
     depends_on:
       - database
     ports:
@@ -21,6 +18,8 @@ services:
       - database
     cap_add:
       - IPC_LOCK
+    env_file:
+      .env
     volumes:
       - ./setup/config.hcl:/vault/config/config.hcl
-    command: vault server -config=/vault/config/config.hcl
+    command: make run
