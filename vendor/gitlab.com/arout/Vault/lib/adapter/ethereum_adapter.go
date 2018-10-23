@@ -170,7 +170,7 @@ func (e *EthereumAdapter) createRawTransaction(p lib.IRawTx, backendLogger log.L
 		big.NewInt(int64(payload.Value)),
 		payload.GasLimit,
 		big.NewInt(int64(payload.GasPrice)),
-		[]byte(payload.Data),
+		common.FromHex(string(payload.Data)),
 	), payload.ChainID, nil
 }
 
