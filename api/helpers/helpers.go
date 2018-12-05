@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"sort"
 
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
@@ -44,13 +43,6 @@ func ValidateFields(req *logical.Request, data *framework.FieldData) error {
 		if _, ok := data.Schema[k]; !ok {
 			unknownFields = append(unknownFields, k)
 		}
-	}
-
-	if len(unknownFields) > 0 {
-		// Sort since this is a human error
-		sort.Strings(unknownFields)
-
-		return fmt.Errorf("unknown fields: %q", unknownFields)
 	}
 
 	return nil
