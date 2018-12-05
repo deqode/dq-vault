@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/hashicorp/vault/logical"
+	"github.com/hashicorp/vault/logical/framework"
 	"gitlab.com/arout/Vault/api/helpers"
 	"gitlab.com/arout/Vault/config"
 	"gitlab.com/arout/Vault/lib"
 	"gitlab.com/arout/Vault/lib/adapter"
 	"gitlab.com/arout/Vault/logger"
-
-	"github.com/hashicorp/vault/logical"
-	"github.com/hashicorp/vault/logical/framework"
 )
 
 func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
@@ -32,7 +31,7 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 	// see supported coinTypes lib/bipp44coins
 	coinType := d.Get("coinType").(int)
 
-	logger.Log(backendLogger, config.Info, "address:", fmt.Sprintf("request uuid=%v path=[%v] cointype=%v ", uuid, derivationPath, coinType))
+	logger.Log(backendLogger, config.Info, "address:", fmt.Sprintf("request path=[%v] cointype=%v ", derivationPath, coinType))
 
 	// validate data provided
 	if err := helpers.ValidateData(ctx, req, uuid, derivationPath); err != nil {
@@ -85,7 +84,7 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	logger.Log(backendLogger, config.Info, "address:", fmt.Sprintf("\n[INFO ] address: uuid=%v derived publicKey=[%v], address=[%v]", uuid, pubKey, address))
+	logger.Log(backendLogger, config.Info, "address:", fmt.Sprintf("\n[INFO ] address:  derived publicKey=[%v], address=[%v]", pubKey, address))
 
 	// Returns publicKey, address as output
 	return &logical.Response{
