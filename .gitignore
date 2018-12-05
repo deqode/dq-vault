@@ -32,3 +32,4 @@ vault.log
 node_modules
 commands
 .env
+vendor/
