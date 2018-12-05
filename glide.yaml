@@ -1,0 +1,41 @@
+package: gitlab.com/arout/Vault
+import:
+- package: github.com/btcsuite/btcd
+  subpackages:
+  - btcec
+  - chaincfg
+  - chaincfg/chainhash
+  - txscript
+  - wire
+- package: github.com/btcsuite/btcutil
+  subpackages:
+  - base58
+  - hdkeychain
+- package: github.com/ethereum/go-ethereum
+  version: 1.8.12
+  subpackages:
+  - common
+  - common/hexutil
+  - core/types
+  - crypto
+- package: github.com/hashicorp/vault
+  version: v0.9.5
+  subpackages:
+  - helper/pluginutil
+  - logical
+  - logical/framework
+  - logical/plugin
+- package: github.com/lestrrat-go/jwx
+  subpackages:
+  - jwa
+  - jwk
+  - jws
+- package: github.com/mgutz/logxi
+  version: v1
+  subpackages:
+  - v1
+- package: github.com/pkg/errors
+  version: v0.8.0
+- package: github.com/rs/xid
+- package: github.com/tyler-smith/go-bip39
+  version: v1

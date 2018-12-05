@@ -1,9 +1,12 @@
 # Stage 1 (to create a "build" image)
 FROM golang:1.10.1 AS source
 
+RUN curl https://glide.sh/get | sh
+
 COPY . /go/src/gitlab.com/arout/Vault/
 WORKDIR /go/src/gitlab.com/arout/Vault/
 
+RUN glide install
 RUN go build
 
 # Stage 2 (to create a vault conatiner with executable)
