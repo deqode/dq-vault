@@ -9,7 +9,7 @@ import (
 
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
-	"github.com/satori/go.uuid"
+	"github.com/rs/xid"
 	"gitlab.com/arout/Vault/config"
 )
 
@@ -21,9 +21,9 @@ type User struct {
 	Passphrase string `json:"passphrase"`
 }
 
-// NewUUID returns a random generated uuid
+// NewUUID returns a globally unique random generated guid
 func NewUUID() string {
-	return uuid.Must(uuid.NewV4()).String()
+	return xid.New().String()
 }
 
 // ErrMissingField returns a logical response error that prints a consistent
