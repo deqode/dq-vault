@@ -30,3 +30,5 @@ Vault-demo
 vault-secrets-gen
 vault.log
 node_modules
+commands
+.env
