@@ -49,11 +49,24 @@ All the required docker files are provided in this repo.
 
 ## Steps
 
+**Note:-**
+ Create `.env` file in the root of repository such that it contains required env variables. Sample of this file is provided in repo named `.env_sample`.
+
+
+
 Run the following command to set-up the vault and Postgres containers:
 
 ```sh
   $ docker-compose up --build
 ```
+
+**OR**
+
+```sh
+  $ make set-up
+  $ make dirty-up
+```
+
 
 The command does the following things:-
 
@@ -153,7 +166,7 @@ If you find the sealed attribute to be false, then your vault is unsealed.
     http://127.0.0.1:8200/v1/sys/plugins/catalog/secrets-api \
     -H 'content-type: application/json' \
     -H 'x-vault-token: ...' \
-    -d '{"sha_256": "8dc7e0f1df9e2e183a7579c7eb102ce40e8a2de44c5ab9378bb348b8dd332358","command": "vault_plugin"}'
+    -d '{"sha_256": "3e46b80e6727e3d1a3982bc10f9c0d698d92c011aa33bc2291145aa63bcd9c9a","command": "vault_plugin"}'
   ```
 
   Provide your initial root token as the x-vault-token.
