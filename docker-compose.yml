@@ -2,7 +2,7 @@ version: '2.1'
 services:
   database:
     image: postgres:10.5
-    container_name: postgres_docker
+    container_name: database
     volumes:
       - ./setup/postgres_docker:/docker-entrypoint-initdb.d/
     env_file:
@@ -10,6 +10,7 @@ services:
   vault:
     build: .
     container_name: vault_plugin
+    image: vault_plugin
     depends_on:
       - database
     ports:
