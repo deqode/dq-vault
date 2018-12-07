@@ -18,7 +18,7 @@ import (
 func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
 	backendLogger := b.Backend.Logger()
 	if err := helpers.ValidateFields(req, d); err != nil {
-		logger.Log(backendLogger, config.Error, "address:", err.Error())
+		logger.Log(backendLogger, config.Error, "1. address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
@@ -36,11 +36,11 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 		derivationPath = config.BitsharesDerivationPath
 	}
 
-	logger.Log(backendLogger, config.Info, "address:", fmt.Sprintf("request path=[%v] cointype=%v ", derivationPath, coinType))
+	logger.Log(backendLogger, config.Info, "2. address:", fmt.Sprintf("request path=[%v] cointype=%v ", derivationPath, coinType))
 
 	// validate data provided
 	if err := helpers.ValidateData(ctx, req, uuid, derivationPath); err != nil {
-		logger.Log(backendLogger, config.Error, "address:", err.Error())
+		logger.Log(backendLogger, config.Error, "3. address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
@@ -48,7 +48,7 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 	path := config.StorageBasePath + uuid
 	entry, err := req.Storage.Get(ctx, path)
 	if err != nil {
-		logger.Log(backendLogger, config.Error, "address:", err.Error())
+		logger.Log(backendLogger, config.Error, "4. address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
@@ -56,7 +56,7 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 	var userInfo helpers.User
 	err = entry.DecodeJSON(&userInfo)
 	if err != nil {
-		logger.Log(backendLogger, config.Error, "address:", err.Error())
+		logger.Log(backendLogger, config.Error, "5. address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
@@ -66,26 +66,26 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 	// obtains blockchain adapater based on coinType
 	adapter, err := adapter.GetAdapter(uint16(coinType), seed, derivationPath)
 	if err != nil {
-		logger.Log(backendLogger, config.Error, "address:", err.Error())
+		logger.Log(backendLogger, config.Error, "6. address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	// Generates and stores ECDSA private key in adapter
 	_, err = adapter.DerivePrivateKey(backendLogger)
 	if err != nil {
-		logger.Log(backendLogger, config.Error, "address:", err.Error())
+		logger.Log(backendLogger, config.Error, "7. address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	pubKey, err := adapter.DerivePublicKey(backendLogger)
 	if err != nil {
-		logger.Log(backendLogger, config.Error, "address:", err.Error())
+		logger.Log(backendLogger, config.Error, "8. address:", err.Error(), "which state", pubKey)
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
 	address, err := adapter.DeriveAddress(backendLogger)
 	if err != nil {
-		logger.Log(backendLogger, config.Error, "address:", err.Error())
+		logger.Log(backendLogger, config.Error, "9. address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 

@@ -37,7 +37,7 @@ type BitsharesAdapter struct {
 // sets seed, derivation path as internal data
 func NewBitsharesAdapter(seed []byte, derivationPath string, isDev bool) *BitsharesAdapter {
 	adapter := new(BitsharesAdapter)
-	adapter.Seed = seed
+	adapter.Seed = make([]byte, 64)
 	adapter.DerivationPath = config.BitsharesDerivationPath
 	adapter.IsDev = isDev
 	adapter.zeroAddress = "0x0000000000000000000000000000000000000000"
@@ -70,13 +70,16 @@ func (e *BitsharesAdapter) DerivePrivateKey(backendLogger log.Logger) (string, e
 // DerivePublicKey returns the public key for BTS format.
 func (e *BitsharesAdapter) DerivePublicKey(logger log.Logger) (string, error) {
 	// obatin private key from seed + derivation path
-	if _, err := e.DerivePrivateKey(logger); err != nil {
-		return "", err
+	_, err := e.DerivePrivateKey(logger)
+	if err != nil {
+		return "private key derivation", err
 	}
+
+	// var pk := btcutil.
 
 	privateKey, err := crypto.HexToECDSA(e.PrivateKey)
 	if err != nil {
-		return "", err
+		return "hex to ecdsa", err
 	}
 
 	mdHash := ripemd160.New()
@@ -91,22 +94,7 @@ func (e *BitsharesAdapter) DerivePublicKey(logger log.Logger) (string, error) {
 // DeriveAddress Address in Bitsahres can be avoided for most cases by using account names instead.
 // TODO : ADD a proper address generation logic.
 func (e *BitsharesAdapter) DeriveAddress(logger log.Logger) (string, error) {
-	// obatin private key from seed + derivation path
-	if _, err := e.DerivePrivateKey(logger); err != nil {
-		return "", err
-	}
-
-	privateKey, err := crypto.HexToECDSA(e.PrivateKey)
-	if err != nil {
-		return "", err
-	}
-
-	publicKeyECDSA, ok := privateKey.Public().(*ecdsa.PublicKey)
-	if !ok {
-		return "", errors.New("Invalid ECDSA public key")
-	}
-
-	return crypto.PubkeyToAddress(*publicKeyECDSA).Hex(), nil
+	return "btsaddressdevWIP", nil
 }
 
 // GetBlockchainNetwork returns network config
@@ -127,6 +115,7 @@ func (e *BitsharesAdapter) CreateSignedTransaction(payload lib.IRawTx, backendLo
 
 	wifs := make([]string, 1)
 	wifs[0] = e.PrivateKey
+	logger.Log(backendLogger, config.Info, "privateWIF:", wifs[0])
 
 	// creates raw transaction from payload
 	digestString, err := e.createRawTransaction(payload, backendLogger)
