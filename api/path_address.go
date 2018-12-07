@@ -11,13 +11,14 @@ import (
 	"gitlab.com/arout/Vault/config"
 	"gitlab.com/arout/Vault/lib"
 	"gitlab.com/arout/Vault/lib/adapter"
+	"gitlab.com/arout/Vault/lib/bip44coins"
 	"gitlab.com/arout/Vault/logger"
 )
 
 func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
 	backendLogger := b.Backend.Logger()
 	if err := helpers.ValidateFields(req, d); err != nil {
-		logger.Log(backendLogger, config.Error, "signature:", err.Error())
+		logger.Log(backendLogger, config.Error, "address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
@@ -30,6 +31,10 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 	// coin type of transaction
 	// see supported coinTypes lib/bipp44coins
 	coinType := d.Get("coinType").(int)
+
+	if uint16(coinType) == bip44coins.Bitshares {
+		derivationPath = config.BitsharesDerivationPath
+	}
 
 	logger.Log(backendLogger, config.Info, "address:", fmt.Sprintf("request path=[%v] cointype=%v ", derivationPath, coinType))
 

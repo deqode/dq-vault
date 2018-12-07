@@ -30,6 +30,13 @@ func DecodeRawTransaction(coinType uint16, payload string) (IRawTx, error) {
 			return tx, fmt.Errorf("Unable to decode payload=[%v] into coin type %v", payload, coinType)
 		}
 		return tx, err
+	case bip44coins.Bitshares:
+		var tx BitsharesRawTx
+		if err = json.Unmarshal([]byte(payload), &tx); err != nil ||
+			reflect.DeepEqual(tx, BitsharesRawTx{}) {
+			return tx, fmt.Errorf("Unable to decode payload=[%v] into coin type %v", payload, coinType)
+		}
+		return tx, err
 	}
 
 	return EthereumRawTx{}, fmt.Errorf("Unsupported coin type %v", coinType)

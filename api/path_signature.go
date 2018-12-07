@@ -11,6 +11,7 @@ import (
 	"gitlab.com/arout/Vault/config"
 	"gitlab.com/arout/Vault/lib"
 	"gitlab.com/arout/Vault/lib/adapter"
+	"gitlab.com/arout/Vault/lib/bip44coins"
 	"gitlab.com/arout/Vault/logger"
 )
 
@@ -34,6 +35,10 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	// data in JSON required for that transaction
 	// depends on type of transaction
 	payload := d.Get("payload").(string)
+
+	if uint16(coinType) == bip44coins.Bitshares {
+		derivationPath = config.BitsharesDerivationPath
+	}
 
 	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("request  path=[%v] cointype=%v payload=[%v]", derivationPath, coinType, payload))
 

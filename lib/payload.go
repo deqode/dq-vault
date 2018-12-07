@@ -31,3 +31,11 @@ type BitcoinRawTx struct {
 	} `json:"outputs"`
 	IRawTx
 }
+
+// BitsharesRawTx Ethereum raw transaction implements IRawTx
+// to store raw Bitshares JSON payload
+// Bitshares' Payload will only have a hex encoded string that would represent the transaction digest.
+type BitsharesRawTx struct {
+	TransactionDigest string `json:"transactionDigest"`
+	IRawTx
+}
