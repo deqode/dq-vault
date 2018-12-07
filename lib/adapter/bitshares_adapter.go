@@ -48,7 +48,6 @@ func NewBitsharesAdapter(seed []byte, derivationPath string, isDev bool) *Bitsha
 // DerivePrivateKey Derives derivation path to obtain private key
 // checks for errors
 func (e *BitsharesAdapter) DerivePrivateKey(backendLogger log.Logger) (string, error) {
-	logger.Log(backendLogger, config.Error, "inside bts adapter DERIVE PUBLIC KEY:", "error")
 	// obatin private key from seed + derivation path
 	btcecPrivKey, err := lib.DerivePrivateKey(e.Seed, e.DerivationPath, e.IsDev)
 	if err != nil {
@@ -122,7 +121,6 @@ func (e *BitsharesAdapter) GetBlockchainNetwork() string {
 // CreateSignedTransaction creates and signs raw transaction from transaction digest + private key
 // TODO :- INCLUDE BTS TRANSACTION DIGEST SIGNATURE LOGIC.
 func (e *BitsharesAdapter) CreateSignedTransaction(payload lib.IRawTx, backendLogger log.Logger) (string, error) {
-	logger.Log(backendLogger, config.Error, "inside bts adapter CREATE SIGNED TRANSACTION:", "error")
 	if _, err := e.DerivePrivateKey(backendLogger); err != nil {
 		return "", err
 	}
@@ -151,7 +149,6 @@ func (e *BitsharesAdapter) CreateSignedTransaction(payload lib.IRawTx, backendLo
 // generates raw transaction from payload
 // returns raw transaction + chainId + error (if any)
 func (e *BitsharesAdapter) createRawTransaction(p lib.IRawTx, backendLogger log.Logger) (string, error) {
-	logger.Log(backendLogger, config.Error, "inside bts adapter CREATE RAW TRANSACTION:", "error")
 	data, _ := json.Marshal(p)
 	var payload lib.BitsharesRawTx
 	err := json.Unmarshal(data, &payload) // payload is now a BitsharesRawTx
