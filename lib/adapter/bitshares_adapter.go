@@ -17,7 +17,6 @@ import (
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/ethereum/go-ethereum/crypto"
 	log "github.com/mgutz/logxi/v1"
 	"gitlab.com/arout/Vault/config"
 	"gitlab.com/arout/Vault/lib"
@@ -72,20 +71,21 @@ func (e *BitsharesAdapter) DerivePublicKey(logger log.Logger) (string, error) {
 	// obatin private key from seed + derivation path
 	_, err := e.DerivePrivateKey(logger)
 	if err != nil {
-		return "private key derivation", err
+		return "", err
 	}
 
-	// var pk := btcutil.
-
-	privateKey, err := crypto.HexToECDSA(e.PrivateKey)
+	// obtain wif object from private key structure.
+	wif, err := btcutil.DecodeWIF(e.PrivateKey)
 	if err != nil {
-		return "hex to ecdsa", err
+		return "", err
 	}
+
+	pubKeyBytes := wif.PrivKey.PubKey().SerializeCompressed()
 
 	mdHash := ripemd160.New()
-	mdHash.Write(toBytes(privateKey.PublicKey))
+	mdHash.Write(pubKeyBytes)
 	checkSum := mdHash.Sum(nil)
-	appendedCS := append(toBytes(privateKey.PublicKey), checkSum[0:4]...)
+	appendedCS := append(pubKeyBytes, checkSum[0:4]...)
 	publicKey := "BTS" + base58.Encode(appendedCS)
 
 	return publicKey, nil
@@ -94,7 +94,7 @@ func (e *BitsharesAdapter) DerivePublicKey(logger log.Logger) (string, error) {
 // DeriveAddress Address in Bitsahres can be avoided for most cases by using account names instead.
 // TODO : ADD a proper address generation logic.
 func (e *BitsharesAdapter) DeriveAddress(logger log.Logger) (string, error) {
-	return "btsaddressdevWIP", nil
+	return "", nil // returns null for address
 }
 
 // GetBlockchainNetwork returns network config
