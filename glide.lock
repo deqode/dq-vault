@@ -1,5 +1,5 @@
-hash: a99d4c82a15b99779c442e6609dcb34becfec65f3f0c1a21a5b0169f6eac26fc
-updated: 2018-12-05T13:24:31.323547529+05:30
+hash: 28d4247fff72a4ff5184160039c21808df5e1794e6e9df8860d33b31cb3f0764
+updated: 2018-12-12T13:28:39.907851391+05:30
 imports:
 - name: github.com/armon/go-radix
   version: 1a2de0c21c94309923825da3df33a4381872c795
@@ -35,6 +35,10 @@ imports:
   - params
   - rlp
   - trie
+- name: github.com/FactomProject/basen
+  version: fe3947df716ebfda9847eb1b9a48f9592e06478c
+- name: github.com/FactomProject/btcutilecc
+  version: d3a63a5752ecf3fbc06bd97365da752111c263df
 - name: github.com/fatih/structs
   version: 878a968ab22548362a09bdb3322f98b00f470d46
 - name: github.com/go-stack/stack
@@ -160,6 +164,8 @@ imports:
   - leveldb/storage
   - leveldb/table
   - leveldb/util
+- name: github.com/tyler-smith/go-bip32
+  version: 2c9cfd17756470a0b7c3e4b7954bae7d11035504
 - name: github.com/tyler-smith/go-bip39
   version: 2af0a847066a4f2669040ccd44a79c8eca10806a
   subpackages:

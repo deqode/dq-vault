@@ -39,3 +39,4 @@ import:
 - package: github.com/rs/xid
 - package: github.com/tyler-smith/go-bip39
   version: v1
+- package: github.com/tyler-smith/go-bip32
