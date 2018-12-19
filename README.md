@@ -1,4 +1,5 @@
 # Hashicorp Vault Secrets Plugin
+# TODO :- add entries for bitshares adapter.
 
 ## Introduction
 
