@@ -48,13 +48,6 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	// decodes JSON payload into object
-	rawTransaction, err := lib.DecodeRawTransaction(uint16(coinType), payload)
-	if err != nil {
-		logger.Log(backendLogger, config.Error, "signature:", err.Error())
-		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
-	}
-
 	// path where user data is stored in vault
 	path := config.StorageBasePath + uuid
 	entry, err := req.Storage.Get(ctx, path)
@@ -89,7 +82,7 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	}
 
 	// creates signature from raw transaction payload
-	txHex, err := adapter.CreateSignedTransaction(rawTransaction, backendLogger)
+	txHex, err := adapter.CreateSignedTransaction(payload, backendLogger)
 	if err != nil {
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())

@@ -1,5 +1,7 @@
 package lib
 
+import "math/big"
+
 // IRawTx Raw transaction interface
 // to enable decoding of all variants of raw transactions (JSON)
 type IRawTx interface{}
@@ -7,13 +9,13 @@ type IRawTx interface{}
 // EthereumRawTx Ethereum raw transaction implements IRawTx
 // to store raw Ethereum JSON payload
 type EthereumRawTx struct {
-	Nonce    uint64 `json:"nonce"`
-	Value    uint64 `json:"value"`
-	GasLimit uint64 `json:"gasLimit"`
-	GasPrice uint64 `json:"gasPrice"`
-	To       string `json:"to"`
-	Data     string `json:"data"`
-	ChainID  int64  `json:"chainId"`
+	Nonce    uint64   `json:"nonce"`
+	Value    *big.Int `json:"value"`
+	GasLimit uint64   `json:"gasLimit"`
+	GasPrice *big.Int `json:"gasPrice"`
+	To       string   `json:"to"`
+	Data     string   `json:"data"`
+	ChainID  *big.Int `json:"chainId"`
 	IRawTx
 }
 

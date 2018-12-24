@@ -13,6 +13,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"reflect"
 
 	secp256k1 "github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -135,7 +136,7 @@ func (e *BitsharesAdapter) GetBlockchainNetwork() string {
 }
 
 // CreateSignedTransaction creates and signs raw transaction from transaction digest + private key
-func (e *BitsharesAdapter) CreateSignedTransaction(payload lib.IRawTx, backendLogger log.Logger) (string, error) {
+func (e *BitsharesAdapter) CreateSignedTransaction(payload string, backendLogger log.Logger) (string, error) {
 	if _, err := e.DerivePrivateKey(backendLogger); err != nil {
 		return "", err
 	}
@@ -162,13 +163,12 @@ func (e *BitsharesAdapter) CreateSignedTransaction(payload lib.IRawTx, backendLo
 }
 
 // creates raw transaction from payload which in this case is of the form {"transactionDigest":"..someValue.."}
-func (e *BitsharesAdapter) createRawTransaction(p lib.IRawTx, backendLogger log.Logger) (string, error) {
-	data, _ := json.Marshal(p)
+func (e *BitsharesAdapter) createRawTransaction(p string, backendLogger log.Logger) (string, error) {
 	var payload lib.BitsharesRawTx
-	err := json.Unmarshal(data, &payload) // payload is now a BitsharesRawTx
-	if err != nil {
+	if err := json.Unmarshal([]byte(p), &payload); err != nil ||
+		reflect.DeepEqual(payload, lib.BitsharesRawTx{}) { // payload is now a BitsharesRawTx
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
-		return "", err
+		return "", fmt.Errorf("Unable to decode payload=[%v]", p)
 	}
 
 	// validate payload data
