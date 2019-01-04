@@ -2,7 +2,7 @@ var chai = require("chai");
 var expect = chai.expect;
 const request = require("request");
 
-const rootToken = "5DZnuE8rxK1iQAXaMJWnZmdu";
+const rootToken = "5oPMP8ATL719MCtwZ1xN0r5s";
 
 describe("Integration test for user registration", () => {
   it("should return uuid of the user when valid user credentials are provided", done => {
