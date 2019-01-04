@@ -698,3 +698,93 @@ describe("Integration test for generating ethereum signature", () => {
     );
   });
 });
+
+describe("Integration test for generating bitshares signature", () => {
+  let uuid;
+  before(done => {
+    const data = {
+      username: "",
+      passphrase: "",
+      mnemonic:
+        "anger name fall borrow wagon hammer reason excuse boss ten dawn leader calm crisp anchor"
+    };
+
+    request.post(
+      {
+        headers: {
+          "X-Vault-Token": rootToken
+        },
+        uri: "http://127.0.0.1:8200/v1/api/register",
+        body: JSON.stringify(data),
+        method: "POST"
+      },
+      function(err, response, body) {
+        let vaultResponse = JSON.parse(body);
+        uuid = vaultResponse.data.uuid;
+        done();
+      }
+    );
+  });
+
+  it("should return a valid signature when valid uuid, payload, path and coinType is provided", done => {
+    const payload = {
+      transactionDigest: "3aef3997194701308d57a65214a7a015d98382ab66a9bc0d655de80842b6bfc5aede09dd6e161ca9095c0105d1d8070000000000001111050007616e6b69743131010000000001021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5010000010000000001021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5010000021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5050000000000000000"
+    };
+
+    const data = {
+      uuid: uuid,
+      path: "",
+      coinType: 240,
+      payload: JSON.stringify(payload)
+    };
+
+    const actualSignature =
+      "1f2e6532af53fa5703780c31b94ff99ba375a8f131e9137c53d42e5512ab86ba80180ba87cfc519aba5ec80c00070fa1bf32c47cf4b594766c651fdacdeb59e18b";
+
+    request.post(
+      {
+        headers: {
+          "X-Vault-Token": rootToken
+        },
+        uri: "http://127.0.0.1:8200/v1/api/signature",
+        body: JSON.stringify(data),
+        method: "POST"
+      },
+      function(err, response, body) {
+        let vaultResponse = JSON.parse(body);
+        expect(response.statusCode).to.equal(200);
+        expect(vaultResponse.data.signature).to.equal(actualSignature);
+        done();
+      }
+    );
+  });
+
+  it("should return error when invalid path is provided", done => {
+    const payload = {
+      transactionDigest: "3aef3997194701308d57a65214a7a015d98382ab66a9bc0d655de80842b6bfc5aede09dd6e161ca9095c0105d1d8070000000000001111050007616e6b69743131010000000001021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5010000010000000001021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5010000021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5050000000000000000"
+    };
+
+    const data = {
+      uuid: uuid,
+      path: "/44'/0'/0'/0/0", //invalid path
+      coinType: 60,
+      payload: JSON.stringify(payload)
+    };
+
+    request.post(
+      {
+        headers: {
+          "X-Vault-Token": rootToken
+        },
+        uri: "http://127.0.0.1:8200/v1/api/signature",
+        body: JSON.stringify(data),
+        method: "POST"
+      },
+      function(err, response, body) {
+        let vaultResponse = JSON.parse(body);
+        expect(response.statusCode).to.not.equal(200);
+        done();
+      }
+    );
+  });
+});
