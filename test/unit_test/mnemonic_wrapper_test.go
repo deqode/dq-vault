@@ -2,10 +2,9 @@ package test
 
 import (
 	"bytes"
-	"errors"
 	"testing"
 
-	bip39 "github.com/tyler-smith/go-bip39"
+	"gitlab.com/arout/Vault/lib"
 )
 
 type mnemonicTestPair struct {
@@ -30,20 +29,9 @@ var mnemonicTests = []mnemonicTestPair{
 	},
 }
 
-func IsMnemonicValid(mnemonic string) bool {
-	return bip39.IsMnemonicValid(mnemonic)
-}
-
-func SeedFromMnemonic(mnemonic, passphrase string) ([]byte, error) {
-	if !IsMnemonicValid(mnemonic) {
-		return nil, errors.New("Invalid Mnemonic")
-	}
-	return bip39.NewSeed(mnemonic, passphrase), nil
-}
-
 func TestMnemonic(t *testing.T) {
 	for _, pair := range mnemonicTests {
-		seed, _ := SeedFromMnemonic(pair.mnemonic, pair.passphrase)
+		seed, _ := lib.SeedFromMnemonic(pair.mnemonic, pair.passphrase)
 		if !bytes.Equal(seed, pair.seed) {
 			t.Error(
 				"Mnemonic", pair.mnemonic,
