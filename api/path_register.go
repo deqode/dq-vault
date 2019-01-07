@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/hashicorp/vault/logical"
+	"github.com/hashicorp/vault/logical/framework"
 	"gitlab.com/arout/Vault/api/helpers"
 	"gitlab.com/arout/Vault/config"
 	"gitlab.com/arout/Vault/lib"
 	"gitlab.com/arout/Vault/logger"
-
-	"github.com/hashicorp/vault/logical"
-	"github.com/hashicorp/vault/logical/framework"
 )
 
 // pathPassphrase corresponds to POST gen/passphrase.
@@ -81,7 +80,7 @@ func (b *backend) pathRegister(ctx context.Context, req *logical.Request, d *fra
 		return nil, logical.CodedError(http.StatusExpectationFailed, err.Error())
 	}
 
-	logger.Log(backendLogger, config.Info, "register:", fmt.Sprintf("user registered uuid=%v username=%v", uuid, username))
+	logger.Log(backendLogger, config.Info, "register:", fmt.Sprintf("user registered username=%v", username))
 
 	// return response
 	return &logical.Response{

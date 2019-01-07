@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/hashicorp/vault/logical"
+	"github.com/hashicorp/vault/logical/framework"
 	"gitlab.com/arout/Vault/api/helpers"
 	"gitlab.com/arout/Vault/config"
 	"gitlab.com/arout/Vault/lib"
 	"gitlab.com/arout/Vault/lib/adapter"
+	"gitlab.com/arout/Vault/lib/bip44coins"
 	"gitlab.com/arout/Vault/logger"
-
-	"github.com/hashicorp/vault/logical"
-	"github.com/hashicorp/vault/logical/framework"
 )
 
 func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
@@ -36,17 +36,14 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	// depends on type of transaction
 	payload := d.Get("payload").(string)
 
-	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("request uuid=%v path=[%v] cointype=%v payload=[%v]", uuid, derivationPath, coinType, payload))
+	if uint16(coinType) == bip44coins.Bitshares {
+		derivationPath = config.BitsharesDerivationPath
+	}
+
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("request  path=[%v] cointype=%v payload=[%v]", derivationPath, coinType, payload))
 
 	// validate data provided
 	if err := helpers.ValidateData(ctx, req, uuid, derivationPath); err != nil {
-		logger.Log(backendLogger, config.Error, "signature:", err.Error())
-		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
-	}
-
-	// decodes JSON payload into object
-	rawTransaction, err := lib.DecodeRawTransaction(uint16(coinType), payload)
-	if err != nil {
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
@@ -85,13 +82,13 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	}
 
 	// creates signature from raw transaction payload
-	txHex, err := adapter.CreateSignedTransaction(rawTransaction, backendLogger)
+	txHex, err := adapter.CreateSignedTransaction(payload, backendLogger)
 	if err != nil {
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("\n[INFO ] signature: created signature uuid=%v signature=[%v]", uuid, txHex))
+	logger.Log(backendLogger, config.Info, "signature:", fmt.Sprintf("\n[INFO ] signature: created signature signature=[%v]", txHex))
 
 	// Returns signature as output
 	return &logical.Response{

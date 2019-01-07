@@ -5,24 +5,24 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/hashicorp/vault/logical"
+	"github.com/hashicorp/vault/logical/framework"
 	"gitlab.com/arout/Vault/api/helpers"
 	"gitlab.com/arout/Vault/config"
 	"gitlab.com/arout/Vault/lib"
 	"gitlab.com/arout/Vault/lib/adapter"
+	"gitlab.com/arout/Vault/lib/bip44coins"
 	"gitlab.com/arout/Vault/logger"
-
-	"github.com/hashicorp/vault/logical"
-	"github.com/hashicorp/vault/logical/framework"
 )
 
 func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
 	backendLogger := b.Backend.Logger()
 	if err := helpers.ValidateFields(req, d); err != nil {
-		logger.Log(backendLogger, config.Error, "signature:", err.Error())
+		logger.Log(backendLogger, config.Error, "address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	// UUID of user which want to sign transaction
+	// UUID of user required to sign transaction
 	uuid := d.Get("uuid").(string)
 
 	// derivation path
@@ -32,7 +32,11 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 	// see supported coinTypes lib/bipp44coins
 	coinType := d.Get("coinType").(int)
 
-	logger.Log(backendLogger, config.Info, "address:", fmt.Sprintf("request uuid=%v path=[%v] cointype=%v ", uuid, derivationPath, coinType))
+	if uint16(coinType) == bip44coins.Bitshares {
+		derivationPath = config.BitsharesDerivationPath
+	}
+
+	logger.Log(backendLogger, config.Info, "address:", fmt.Sprintf("request path=[%v] cointype=%v ", derivationPath, coinType))
 
 	// validate data provided
 	if err := helpers.ValidateData(ctx, req, uuid, derivationPath); err != nil {
@@ -48,7 +52,7 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	// obtain mnemonic, passphrase of user
+	// obtain mnemonic and passphrase of user
 	var userInfo helpers.User
 	err = entry.DecodeJSON(&userInfo)
 	if err != nil {
@@ -57,7 +61,10 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 	}
 
 	// obtain seed from mnemonic and passphrase
+	logger.Log(backendLogger, config.Info, "mnemonic", userInfo.Mnemonic, userInfo.Passphrase)
 	seed, err := lib.SeedFromMnemonic(userInfo.Mnemonic, userInfo.Passphrase)
+
+	logger.Log(backendLogger, config.Info, "dp", derivationPath)
 
 	// obtains blockchain adapater based on coinType
 	adapter, err := adapter.GetAdapter(uint16(coinType), seed, derivationPath)
@@ -67,15 +74,17 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 	}
 
 	// Generates and stores ECDSA private key in adapter
-	_, err = adapter.DerivePrivateKey(backendLogger)
+	priv, err := adapter.DerivePrivateKey(backendLogger)
 	if err != nil {
 		logger.Log(backendLogger, config.Error, "address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
+	logger.Log(backendLogger, config.Info, "priv", priv)
+
 	pubKey, err := adapter.DerivePublicKey(backendLogger)
 	if err != nil {
-		logger.Log(backendLogger, config.Error, "address:", err.Error())
+		logger.Log(backendLogger, config.Error, "address:", err.Error(), "which state", pubKey)
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
@@ -85,9 +94,9 @@ func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *fram
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	logger.Log(backendLogger, config.Info, "address:", fmt.Sprintf("\n[INFO ] address: uuid=%v derived publicKey=[%v], address=[%v]", uuid, pubKey, address))
+	logger.Log(backendLogger, config.Info, "address:", fmt.Sprintf("\n[INFO ] address:  derived publicKey=[%v], address=[%v]", pubKey, address))
 
-	// Returns publicKey, address as output
+	// Returns publicKey and address as output
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"uuid":      uuid,

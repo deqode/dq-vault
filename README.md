@@ -1,4 +1,5 @@
 # Hashicorp Vault Secrets Plugin
+# TODO :- add entries for bitshares adapter.
 
 ## Introduction
 
@@ -441,11 +442,12 @@ Once a user is registered, we can now sign raw transactions just by using the us
   - Bitcoin:0
   - Bitcoin Testnet:1
   - Ethereum:60
+  - Bitshares:240
 ```
 
 #### Payload
 
-Since payload contains the raw transaction, it's structure differs for Bitcoin and ethereum.
+Since payload contains the raw transaction, it's structure differs for Bitcoin and ethereum. For, Bitshares, however only the transaction digest is used to generate the signatures.
 
 ##### Bitcoin
 
@@ -515,6 +517,24 @@ The request finally returns a signature of a raw transaction which was signed in
 - Stored mnemonic corresponding to the provided uuid.
 - HD wallet path.
 
+##### Bitshares
+
+```
+  {
+    transactionDigest : string
+  }
+```
+
+Example payload:
+
+```
+  {
+    "transactionDigest":"3aef3997194701308d57a65214a7a015d98382ab66a9bc0d655de80842b6bfc5aede09dd6e161ca9095c0105d1d8070000000000001111050007616e6b69743131010000000001021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5010000010000000001021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5010000021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5050000000000000000"
+  }
+```
+
+The request finally returns a signature of a raw transaction which was signed inside vault using the following things:
+
 #### CLI
 
 BTC:
@@ -554,6 +574,19 @@ ETH:
   Key          Value
   ---          -----
   signature    0xf868808506fc23ac00825208944592d8f8d7b001e72cb26a73e4fa1806a51ac79d843b9aca008026a08a465e9d1c707d02f72360ab21d1a1be5faf84671413e7df0402e954a666cd79a04ab6481295d13f31fc4265888e8bd9962e200062889f162b320caf4c697f96c4
+```
+
+BTS:
+
+```sh
+  $ vault write api/signature uuid="bgnkf4dgouhsb9enplqg" \
+  path="" \
+  payload="{\"transactionDigest\":\"3aef3997194701308d57a65214a7a015d98382ab66a9bc0d655de80842b6bfc5aede09dd6e161ca9095c0105d1d8070000000000001111050007616e6b69743131010000000001021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5010000010000000001021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5010000021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5050000000000000000\"}" \
+  coinType=240
+
+  Key          Value
+  ---          -----
+  signature    1f2e6532af53fa5703780c31b94ff99ba375a8f131e9137c53d42e5512ab86ba80180ba87cfc519aba5ec80c00070fa1bf32c47cf4b594766c651fdacdeb59e18b
 ```
 
 #### API call
@@ -661,6 +694,41 @@ ETH:
     "warnings":null,
     "auth":null
   }
+```
+
+BTS:
+
+```sh
+  $ cat payload.json
+  {
+    "uuid": "bgnkf4dgouhsb9enplqg,
+    "path": "",
+    "payload": "{\"transactionDigest\":\"3aef3997194701308d57a65214a7a015d98382ab66a9bc0d655de80842b6bfc5aede09dd6e161ca9095c0105d1d8070000000000001111050007616e6b69743131010000000001021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5010000010000000001021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5010000021500e918e7ca8c63e40472c9a2ab28665d06a41e78d034ee1b2ff2b3635d02e5050000000000000000\"}",
+    "coinType": 240
+  }
+
+  $ curl \
+    --header "X-Vault-Token: ..." \
+    --request POST \
+    --data @payload.json \
+    http://127.0.0.1:8200/v1/api/signature
+```
+
+```
+  Response:
+
+ {
+    "request_id": "ee20193d-48bd-1f97-e407-a9f376075cb3",
+    "lease_id": "",
+    "renewable": false,
+    "lease_duration": 0,
+    "data": {
+        "signature": "1f2e6532af53fa5703780c31b94ff99ba375a8f131e9137c53d42e5512ab86ba80180ba87cfc519aba5ec80c00070fa1bf32c47cf4b594766c651fdacdeb59e18b"
+    },
+    "wrap_info": null,
+    "warnings": null,
+    "auth": null
+}
 ```
 
 cURL requests for all of the above commands can be imported to postman via vault_postman_collection.json.

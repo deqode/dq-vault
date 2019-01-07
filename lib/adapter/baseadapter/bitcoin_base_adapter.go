@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -105,7 +106,7 @@ func (b *BitcoinBaseAdapter) GetBlockchainNetwork() string {
 	return "mainnet"
 }
 
-func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx, backendLogger log.Logger) (string, error) {
+func (b *BitcoinBaseAdapter) CreateSignedTransaction(p string, backendLogger log.Logger) (string, error) {
 	network := &chaincfg.MainNetParams
 	if b.IsDev {
 		network = &chaincfg.TestNet3Params
@@ -231,10 +232,12 @@ func (b *BitcoinBaseAdapter) CreateSignedTransaction(p lib.IRawTx, backendLogger
 	return hex.EncodeToString(signedTx.Bytes()), nil
 }
 
-func parsePayload(p lib.IRawTx) (lib.BitcoinRawTx, error) {
-	data, _ := json.Marshal(p)
+func parsePayload(p string) (lib.BitcoinRawTx, error) {
 	var payload lib.BitcoinRawTx
-	err := json.Unmarshal(data, &payload)
+	if err := json.Unmarshal([]byte(p), &payload); err != nil ||
+		reflect.DeepEqual(payload, lib.BitcoinRawTx{}) {
+		return payload, fmt.Errorf("Unable to decode payload=[%v]", p)
+	}
 
-	return payload, err
+	return payload, nil
 }

@@ -2,7 +2,6 @@ package baseadapter
 
 import (
 	log "github.com/mgutz/logxi/v1"
-	"gitlab.com/arout/Vault/lib"
 )
 
 // IBlockchainAdapter Blockchain Adapter Interface
@@ -12,7 +11,7 @@ type IBlockchainAdapter interface {
 	DerivePublicKey(log.Logger) (string, error)
 	DeriveAddress(log.Logger) (string, error)
 	GetBlockchainNetwork() string
-	CreateSignedTransaction(lib.IRawTx, log.Logger) (string, error)
+	CreateSignedTransaction(string, log.Logger) (string, error)
 }
 
 // BlockchainAdapter contains common fields for

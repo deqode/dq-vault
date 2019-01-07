@@ -5,11 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"sort"
 
 	"github.com/hashicorp/vault/logical"
 	"github.com/hashicorp/vault/logical/framework"
-	"github.com/satori/go.uuid"
+	"github.com/rs/xid"
 	"gitlab.com/arout/Vault/config"
 )
 
@@ -21,9 +20,9 @@ type User struct {
 	Passphrase string `json:"passphrase"`
 }
 
-// NewUUID returns a random generated uuid
+// NewUUID returns a globally unique random generated guid
 func NewUUID() string {
-	return uuid.Must(uuid.NewV4()).String()
+	return xid.New().String()
 }
 
 // ErrMissingField returns a logical response error that prints a consistent
@@ -44,13 +43,6 @@ func ValidateFields(req *logical.Request, data *framework.FieldData) error {
 		if _, ok := data.Schema[k]; !ok {
 			unknownFields = append(unknownFields, k)
 		}
-	}
-
-	if len(unknownFields) > 0 {
-		// Sort since this is a human error
-		sort.Strings(unknownFields)
-
-		return fmt.Errorf("unknown fields: %q", unknownFields)
 	}
 
 	return nil

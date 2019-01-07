@@ -79,6 +79,7 @@ Returns randomly generated user UUID
 					"path": &framework.FieldSchema{
 						Type:        framework.TypeString,
 						Description: "Deviation path to obtain keys",
+						Default:     "",
 					},
 					"coinType": &framework.FieldSchema{
 						Type:        framework.TypeInt,
@@ -107,6 +108,7 @@ Returns randomly generated user UUID
 					"path": &framework.FieldSchema{
 						Type:        framework.TypeString,
 						Description: "Deviation path to address",
+						Default:     "",
 					},
 					"coinType": &framework.FieldSchema{
 						Type:        framework.TypeInt,

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"reflect"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -109,7 +110,7 @@ func (e *EthereumAdapter) GetBlockchainNetwork() string {
 }
 
 // CreateSignedTransaction creates and signs raw transaction from payload data + private key
-func (e *EthereumAdapter) CreateSignedTransaction(payload lib.IRawTx, backendLogger log.Logger) (string, error) {
+func (e *EthereumAdapter) CreateSignedTransaction(payload string, backendLogger log.Logger) (string, error) {
 	// convert hex to ECDSA private key
 	privateKey, err := crypto.HexToECDSA(e.PrivateKey)
 	if err != nil {
@@ -123,8 +124,9 @@ func (e *EthereumAdapter) CreateSignedTransaction(payload lib.IRawTx, backendLog
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return "", err
 	}
+
 	// sign raw transaction using raw transaction + chainId + private key
-	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(big.NewInt(chainID)), privateKey)
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), privateKey)
 	if err != nil {
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return "", err
@@ -138,20 +140,22 @@ func (e *EthereumAdapter) CreateSignedTransaction(payload lib.IRawTx, backendLog
 
 // generates raw transaction from payload
 // returns raw transaction + chainId + error (if any)
-func (e *EthereumAdapter) createRawTransaction(p lib.IRawTx, backendLogger log.Logger) (*types.Transaction, int64, error) {
-	data, _ := json.Marshal(p)
+func (e *EthereumAdapter) createRawTransaction(payloadString string, backendLogger log.Logger) (*types.Transaction, *big.Int, error) {
+
 	var payload lib.EthereumRawTx
-	err := json.Unmarshal(data, &payload)
-	if err != nil {
-		logger.Log(backendLogger, config.Error, "signature:", err.Error())
-		return nil, 0, err
+	if err := json.Unmarshal([]byte(payloadString), &payload); err != nil ||
+		reflect.DeepEqual(payload, lib.EthereumRawTx{}) {
+		errorMsg := fmt.Sprintf("Unable to decode payload=[%v]", payloadString)
+
+		logger.Log(backendLogger, config.Error, "signature:", errorMsg)
+		return nil, nil, errors.New(errorMsg)
 	}
 
 	// validate payload data
 	valid, txType := validatePayload(payload, e.zeroAddress)
 	if !valid {
 		logger.Log(backendLogger, config.Error, "signature:", "Invalid payload data")
-		return nil, 0, errors.New("Invalid payload data")
+		return nil, nil, errors.New("Invalid payload data")
 	}
 
 	// logging transaction payload info
@@ -167,18 +171,20 @@ func (e *EthereumAdapter) createRawTransaction(p lib.IRawTx, backendLogger log.L
 	return types.NewTransaction(
 		payload.Nonce,
 		common.HexToAddress(payload.To),
-		big.NewInt(int64(payload.Value)),
+		payload.Value,
 		payload.GasLimit,
-		big.NewInt(int64(payload.GasPrice)),
+		payload.GasPrice,
 		common.FromHex(string(payload.Data)),
 	), payload.ChainID, nil
 }
 
 // validate payload inputs and returns type of
 // transaction if payload is valid
-// TODO: improve this
 func validatePayload(payload lib.EthereumRawTx, zeroAddress string) (bool, string) {
-	if payload.ChainID < 0 {
+	// Value, chainId, GasPrice should not be negative
+	if payload.ChainID.Cmp(big.NewInt(0)) == -1 ||
+		payload.Value.Cmp(big.NewInt(0)) == -1 ||
+		payload.GasPrice.Cmp(big.NewInt(0)) == -1 {
 		return false, ""
 	}
 

@@ -7,6 +7,9 @@ const (
 
 	// Entropy is default  length of the bits in the entropy
 	Entropy = 256
+
+	// BitsharesDerivationPath used to hard code BTS to some derivation path.
+	BitsharesDerivationPath = "m/44'/69'/69'/69/69"
 )
 
 // supported log levels

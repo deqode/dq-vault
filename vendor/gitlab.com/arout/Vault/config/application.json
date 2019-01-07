@@ -1,3 +1,0 @@
-{
-  "policy": "path \"api/*\" { capabilities = [\"read\", \"update\"]}"
-}

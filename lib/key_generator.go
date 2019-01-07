@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil/hdkeychain"
+	bip32 "github.com/tyler-smith/go-bip32"
 )
 
 // DefaultRootDerivationPath is the root path to which custom derivation endpoints
@@ -32,32 +32,30 @@ type derivationPath []uint32
 
 // DerivePrivateKey derives the private key of the derivation path.
 func DerivePrivateKey(seed []byte, path string, isDev bool) (*btcec.PrivateKey, error) {
-	network := &chaincfg.MainNetParams
-	if isDev {
-		network = &chaincfg.TestNet3Params
-	}
-
 	// parse derivation path
 	deriavtionPath, err := parseDerivationPath(path)
 	if err != nil {
 		return nil, err
 	}
 
-	// derive master node
-	key, err := hdkeychain.NewMaster(seed, network)
+	key, err := bip32.NewMasterKey(seed)
 	if err != nil {
 		return nil, err
 	}
 
-	// derive desired account node
 	for _, n := range deriavtionPath {
-		key, err = key.Child(n)
+		key, err = key.NewChildKey(n)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return key.ECPrivKey()
+	privKey, err := hdkeychain.NewKeyFromString(key.B58Serialize())
+	if err != nil {
+		return nil, err
+	}
+
+	return privKey.ECPrivKey()
 }
 
 // ParseDerivationPath converts a user specified derivation path string to the
