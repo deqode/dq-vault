@@ -24,6 +24,7 @@ RUN apk add glibc-2.28-r0.apk
 # Copy executable from source to vault
 COPY --from=source /go/src/gitlab.com/arout/Vault/Vault /vault/plugins/vault_plugin
 COPY ./Makefile .
+COPY ./setup/config.hcl /vault/config/config.hcl
 
 # TODO: add make run
 CMD ["make", "run"]

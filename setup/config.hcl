@@ -1,5 +1,5 @@
 storage "postgresql" {
-  connection_url = "postgres://vault:vault@database:5432/vault?sslmode=disable"
+  connection_url = "postgres://postgres:J22iNI1ize3nw2Bt@172.17.96.5:5432/vault?sslmode=disable"
   table="vault_kv_store"
 }
 
