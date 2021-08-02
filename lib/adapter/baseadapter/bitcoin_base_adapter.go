@@ -16,9 +16,9 @@ import (
 	"github.com/btcsuite/btcutil"
 	"github.com/btcsuite/btcutil/base58"
 	log "github.com/mgutz/logxi/v1"
-	"gitlab.com/arout/Vault/config"
-	"gitlab.com/arout/Vault/lib"
-	"gitlab.com/arout/Vault/logger"
+	"vault/config"
+	"vault/lib"
+	"vault/logger"
 )
 
 type BitcoinBaseAdapter struct {

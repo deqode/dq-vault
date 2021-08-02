@@ -3,8 +3,8 @@ package adapter
 import (
 	"fmt"
 
-	"gitlab.com/arout/Vault/lib/adapter/baseadapter"
-	"gitlab.com/arout/Vault/lib/bip44coins"
+	"vault/lib/adapter/baseadapter"
+	"vault/lib/bip44coins"
 )
 
 // GetAdapter returns suitable adapter depending on coin type

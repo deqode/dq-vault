@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"gitlab.com/arout/Vault/lib/bip44coins"
+	"vault/lib/bip44coins"
 )
 
 // DecodeRawTransaction decodes input payload into suitable raw transaction

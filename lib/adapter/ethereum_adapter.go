@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"encoding/json"
 	"errors"
@@ -14,10 +15,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	log "github.com/mgutz/logxi/v1"
-	"gitlab.com/arout/Vault/config"
-	"gitlab.com/arout/Vault/lib"
-	"gitlab.com/arout/Vault/lib/adapter/baseadapter"
-	"gitlab.com/arout/Vault/logger"
+	"vault/config"
+	"vault/lib"
+	"vault/lib/adapter/baseadapter"
+	"vault/logger"
 )
 
 // EthereumAdapter - Ethereum blockchain transaction adapter
@@ -132,8 +133,9 @@ func (e *EthereumAdapter) CreateSignedTransaction(payload string, backendLogger 
 		return "", err
 	}
 	// obtains signed transaction hex
-	ts := types.Transactions{signedTx}
-	txHex := hexutil.Encode(ts.GetRlp(0))
+	var signedTxBuff bytes.Buffer
+	signedTx.EncodeRLP(&signedTxBuff)
+	txHex := hexutil.Encode(signedTxBuff.Bytes())
 
 	return txHex, nil
 }

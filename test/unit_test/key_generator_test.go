@@ -6,7 +6,7 @@ import (
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
-	"gitlab.com/arout/Vault/lib"
+	"vault/lib"
 )
 
 type privateKeyInput struct {

@@ -4,23 +4,26 @@ import (
 	"log"
 	"os"
 
-	"github.com/hashicorp/vault/helper/pluginutil"
-	"github.com/hashicorp/vault/logical/plugin"
-	"gitlab.com/arout/Vault/api"
+	hasApi "github.com/hashicorp/vault/api"
+	"github.com/hashicorp/vault/sdk/plugin"
+	api "vault/api"
 )
 
 func main() {
-	apiClientMeta := &pluginutil.APIClientMeta{}
+	apiClientMeta := &hasApi.PluginAPIClientMeta{}
 	flags := apiClientMeta.FlagSet()
-	flags.Parse(os.Args[1:])
+	flags.Parse(os.Args[1:]) // Ignore command, strictly parse flags
 
 	tlsConfig := apiClientMeta.GetTLSConfig()
-	tlsProviderFunc := pluginutil.VaultPluginTLSProvider(tlsConfig)
+	tlsProviderFunc := hasApi.VaultPluginTLSProvider(tlsConfig)
 
-	if err := plugin.Serve(&plugin.ServeOpts{
+	err := plugin.Serve(&plugin.ServeOpts{
 		BackendFactoryFunc: api.Factory,
 		TLSProviderFunc:    tlsProviderFunc,
-	}); err != nil {
-		log.Fatal(err)
+	})
+
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	log "github.com/mgutz/logxi/v1"
-	"gitlab.com/arout/Vault/config"
+	"vault/config"
 )
 
 // Log - for logging of messages

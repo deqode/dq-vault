@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"gitlab.com/arout/Vault/lib"
+	"vault/lib"
 )
 
 type mnemonicTestPair struct {

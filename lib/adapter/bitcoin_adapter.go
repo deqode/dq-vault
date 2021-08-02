@@ -1,6 +1,6 @@
 package adapter
 
-import "gitlab.com/arout/Vault/lib/adapter/baseadapter"
+import "vault/lib/adapter/baseadapter"
 
 type BitcoinAdapter struct {
 	baseadapter.BitcoinBaseAdapter

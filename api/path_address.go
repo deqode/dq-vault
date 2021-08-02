@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hashicorp/vault/logical"
-	"github.com/hashicorp/vault/logical/framework"
-	"gitlab.com/arout/Vault/api/helpers"
-	"gitlab.com/arout/Vault/config"
-	"gitlab.com/arout/Vault/lib"
-	"gitlab.com/arout/Vault/lib/adapter"
-	"gitlab.com/arout/Vault/lib/bip44coins"
-	"gitlab.com/arout/Vault/logger"
+	"github.com/hashicorp/vault/sdk/framework"
+	"github.com/hashicorp/vault/sdk/logical"
+	"vault/api/helpers"
+	"vault/config"
+	"vault/lib"
+	"vault/lib/adapter"
+	"vault/lib/bip44coins"
+	"vault/logger"
 )
 
 func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
-	backendLogger := b.Backend.Logger()
+	backendLogger := b.logger
 	if err := helpers.ValidateFields(req, d); err != nil {
 		logger.Log(backendLogger, config.Error, "address:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())

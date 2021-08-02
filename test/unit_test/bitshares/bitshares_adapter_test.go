@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	log "github.com/mgutz/logxi/v1"
-	"gitlab.com/arout/Vault/lib/adapter"
+	"vault/lib/adapter"
 )
 
 var logger = log.New("tests")
