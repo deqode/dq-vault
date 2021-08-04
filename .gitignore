@@ -34,3 +34,4 @@ commands
 .env
 vendor/
 /dq-vault
+.idea

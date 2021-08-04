@@ -1,4 +1,4 @@
-# `dq-vault` - Hashicorp vault BTC/ETH Plugin
+# dq-vault - Hashicorp vault BTC/ETH plugin
 
 [comment]: <> (<p align="center"><img src="https://deqode.github.io/GoArcc/img/logo.svg" width="400"></p>)
 
@@ -739,3 +739,11 @@ BTS:
 cURL requests for all of the above commands can be imported to postman via vault_postman_collection.json.
 
 Note: If using postman, replace the existing token with yours in the header section of each request.
+## License
+```
+Copyright 2021, DeqodeLabs (https://deqode.com/)
+
+Licensed under the MIT License(the "License");
+
+```
+<p align="center"><img src="https://deqode.com/wp-content/uploads/presskit-logo.png" width="400"></p>
