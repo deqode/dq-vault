@@ -1,7 +1,12 @@
-# Hashicorp Vault Secrets Plugin
-# TODO :- add entries for bitshares adapter.
+# `dq-vault` - Hashicorp vault BTC/ETH Plugin
 
-## Introduction
+[comment]: <> (<p align="center"><img src="https://deqode.github.io/GoArcc/img/logo.svg" width="400"></p>)
+
+![GitHub](https://img.shields.io/github/license/deqode/dq-vault)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/deqode/dq-vault)](https://pkg.go.dev/github.com/github.com/deqode/dq-vault)
+[![Go Report Card](https://goreportcard.com/badge/github.com/deqode/dq-vault)](https://goreportcard.com/report/github.com/deqode/dq-vault)
+![GitHub last commit](https://img.shields.io/github/last-commit/deqode/codeanalyser)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/deqode/dq-vault)
 
 This vault plugin stores a user's mnemonic inside vault in an encrypted manner. The plugin uses this stored mnemonic to derive a private key based on an HD wallet path provided by the user and signs a raw transaction given as input using that private key. All this process happens inside the vault and the user never knows the mnemonic (unless he has provided it manually) or the private key derived. All he needs to do is give a raw transaction as input and the vault returns a signed transaction. A particular user is identified in the vault using a UUID generated when the user is initially registered in the vault.
 

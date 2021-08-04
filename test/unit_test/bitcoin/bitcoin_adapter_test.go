@@ -3,8 +3,8 @@ package tests
 import (
 	"testing"
 
+	"github.com/deqode/dq-vault/lib/adapter"
 	log "github.com/mgutz/logxi/v1"
-	"vault/lib/adapter"
 )
 
 var logger = log.New("tests")

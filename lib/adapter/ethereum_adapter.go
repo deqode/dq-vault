@@ -15,10 +15,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	log "github.com/mgutz/logxi/v1"
-	"vault/config"
-	"vault/lib"
-	"vault/lib/adapter/baseadapter"
-	"vault/logger"
+	"github.com/deqode/dq-vault/config"
+	"github.com/deqode/dq-vault/lib"
+	"github.com/deqode/dq-vault/lib/adapter/baseadapter"
+	"github.com/deqode/dq-vault/logger"
 )
 
 // EthereumAdapter - Ethereum blockchain transaction adapter

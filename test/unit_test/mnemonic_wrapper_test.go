@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"vault/lib"
+	"github.com/deqode/dq-vault/lib"
 )
 
 type mnemonicTestPair struct {

@@ -16,9 +16,9 @@ import (
 	"github.com/btcsuite/btcutil"
 	"github.com/btcsuite/btcutil/base58"
 	log "github.com/mgutz/logxi/v1"
-	"vault/config"
-	"vault/lib"
-	"vault/logger"
+	"github.com/deqode/dq-vault/config"
+	"github.com/deqode/dq-vault/lib"
+	"github.com/deqode/dq-vault/logger"
 )
 
 type BitcoinBaseAdapter struct {

@@ -7,12 +7,12 @@ import (
 
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
-	"vault/api/helpers"
-	"vault/config"
-	"vault/lib"
-	"vault/lib/adapter"
-	"vault/lib/bip44coins"
-	"vault/logger"
+	"github.com/deqode/dq-vault/api/helpers"
+	"github.com/deqode/dq-vault/config"
+	"github.com/deqode/dq-vault/lib"
+	"github.com/deqode/dq-vault/lib/adapter"
+	"github.com/deqode/dq-vault/lib/bip44coins"
+	"github.com/deqode/dq-vault/logger"
 )
 
 func (b *backend) pathAddress(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {

@@ -1,6 +1,6 @@
 package adapter
 
-import "vault/lib/adapter/baseadapter"
+import "github.com/deqode/dq-vault/lib/adapter/baseadapter"
 
 type BitcoinAdapter struct {
 	baseadapter.BitcoinBaseAdapter

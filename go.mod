@@ -1,4 +1,4 @@
-module vault
+module github.com/deqode/dq-vault
 
 go 1.16
 

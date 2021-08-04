@@ -21,11 +21,11 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	log "github.com/mgutz/logxi/v1"
 	"golang.org/x/crypto/ripemd160"
-	"vault/config"
-	"vault/lib"
-	"vault/lib/adapter/baseadapter"
-	"vault/lib/rfc6979"
-	"vault/logger"
+	"github.com/deqode/dq-vault/config"
+	"github.com/deqode/dq-vault/lib"
+	"github.com/deqode/dq-vault/lib/adapter/baseadapter"
+	"github.com/deqode/dq-vault/lib/rfc6979"
+	"github.com/deqode/dq-vault/logger"
 )
 
 // BitsharesAdapter - Ethereum blockchain transaction adapter

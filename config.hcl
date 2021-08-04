@@ -10,5 +10,5 @@ storage "file" {
   path = "/home/deq/etc/tmp/vault-data"
 }
 
-"plugin_directory" = "/home/deq/etc/vault.d/vault_plugins"
-"api_addr" = "http://127.0.0.1:8200"
+plugin_directory = "/home/deq/etc/vault/plugins/vault_plugin"
+api_addr = "http://127.0.0.1:8200"

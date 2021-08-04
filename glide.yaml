@@ -1,4 +1,4 @@
-package: gitlab.com/arout/Vault
+package: github.com/deqode/dq-vault
 import:
 - package: github.com/btcsuite/btcd
   subpackages:

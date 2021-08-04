@@ -5,7 +5,7 @@ import (
 	"time"
 
 	log "github.com/mgutz/logxi/v1"
-	"vault/config"
+	"github.com/deqode/dq-vault/config"
 )
 
 // Log - for logging of messages

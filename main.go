@@ -6,7 +6,7 @@ import (
 
 	hasApi "github.com/hashicorp/vault/api"
 	"github.com/hashicorp/vault/sdk/plugin"
-	api "vault/api"
+	api "github.com/deqode/dq-vault/api"
 )
 
 func main() {
