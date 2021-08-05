@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdq_vault=self.webpackChunkdq_vault||[]).push([[779],{2939:function(e){e.exports=JSON.parse('{"permalink":"/dq-vault/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":3,"previousPage":null,"nextPage":null,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

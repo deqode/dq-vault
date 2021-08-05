@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdq_vault=self.webpackChunkdq_vault||[]).push([[478],{8583:function(a){a.exports=JSON.parse('{"allTagsPath":"/dq-vault/blog/tags","slug":"facebook","name":"facebook","count":1,"permalink":"/dq-vault/blog/tags/facebook"}')}}]);

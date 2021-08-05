@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdq_vault=self.webpackChunkdq_vault||[]).push([[823],{2364:function(u){u.exports=JSON.parse('{"allTagsPath":"/dq-vault/blog/tags","slug":"docusaurus","name":"docusaurus","count":3,"permalink":"/dq-vault/blog/tags/docusaurus"}')}}]);
