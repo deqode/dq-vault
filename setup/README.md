@@ -1,6 +1,6 @@
 # PART 1 :- Setting up Vault using Docker
 
-We are assuming that you have docker and docker-compose installed in your system. If not, set up your docker environment first or refer to the original [README.md](https://gitlab.com/arout/Vault/blob/master/README.md) for manual setting up of the vault.
+We are assuming that you have docker and docker-compose installed in your system. If not, set up your docker environment first or refer to the original [documentation](http://localhost:3000/dq-vault/) for manual setting up of the vault.
 
 Also, you need to have Postgres set up in your system.
 
@@ -236,4 +236,4 @@ We then give these credentials to the application server, who will use this user
 
 We can easily create multiple user login credentials for different application servers.
 
-For information on plugin usage, follow this [link](https://gitlab.com/arout/Vault/blob/master/README.md#part-2-using-vault).
+For information on plugin usage, follow this [link](http://localhost:3000/dq-vault/docs/guides/plugin-usage).
