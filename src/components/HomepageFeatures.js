@@ -4,16 +4,16 @@ import styles from './HomepageFeatures.module.css';
 
 const FeatureList = [
   {
-    title: 'Making blockchain safe',
+    title: 'A Solution to store Private keys and Sign txns securely',
     Svg: require('../../static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        This Plugin is design in a way that stores a user's mnemonic inside vault in an encrypted manner
+        This Plugin is design in a way that stores a user's mnemonic inside vault in an encrypted manner.
       </>
     ),
   },
   {
-    title: 'Easy user management',
+    title: 'Easy User Management',
     Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
@@ -26,7 +26,7 @@ const FeatureList = [
         Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
         description: (
             <>
-                This plugin help you to focus on other things rather focusing on signing a transaction manually.
+                This plugin help you to focus on other development rather focusing on signing a txns manually.
             </>
         ),
     },

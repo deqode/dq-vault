@@ -10,7 +10,7 @@ This part of setting up dq-vault can be done using two methods. You may follow a
   Setting up Vault manually. The steps are given below in this document, starting from vault installation to creating your own vault server by using the CLI.
 
 :::info
-If you are already done with setting up the vault server using method 1, you may go directly to ** [part 2](https://deqode.github.io/dq-vault/docs/guides/usage)** which elaborates the usage of the vault as an application server
+If you are already done with setting up the vault server using method 1, you may go directly to ** [part 2](https://deqode.github.io/dq-vault/docs/guides/plugin-usage)** which elaborates the usage of the vault as an application server
 :::
 ## Vault installation
 
