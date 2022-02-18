@@ -10,15 +10,15 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
-	log "github.com/mgutz/logxi/v1"
 	"github.com/deqode/dq-vault/config"
 	"github.com/deqode/dq-vault/lib"
 	"github.com/deqode/dq-vault/lib/adapter/baseadapter"
 	"github.com/deqode/dq-vault/logger"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	log "github.com/sirupsen/logrus"
 )
 
 // EthereumAdapter - Ethereum blockchain transaction adapter
