@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	log "github.com/mgutz/logxi/v1"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"

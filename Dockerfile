@@ -6,7 +6,7 @@ RUN curl https://glide.sh/get | sh
 COPY . /go/src/github.com/deqode/dq-vault/
 WORKDIR /go/src/github.com/deqode/dq-vault/
 
-RUN glide install
+#RUN glide install
 RUN go build
 
 # Stage 2 (to create a vault conatiner with executable)

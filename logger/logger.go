@@ -1,11 +1,10 @@
 package logger
 
 import (
+	"github.com/deqode/dq-vault/config"
+	log "github.com/sirupsen/logrus"
 	"strings"
 	"time"
-
-	log "github.com/mgutz/logxi/v1"
-	"github.com/deqode/dq-vault/config"
 )
 
 // Log - for logging of messages

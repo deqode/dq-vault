@@ -1,7 +1,7 @@
 package baseadapter
 
 import (
-	log "github.com/mgutz/logxi/v1"
+	log "github.com/sirupsen/logrus"
 )
 
 // IBlockchainAdapter Blockchain Adapter Interface

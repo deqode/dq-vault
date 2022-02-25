@@ -33,5 +33,5 @@ node_modules
 commands
 .env
 vendor/
-/dq-vault
+/vault/plugin/dq-vault
 .idea
