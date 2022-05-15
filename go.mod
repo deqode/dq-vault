@@ -15,5 +15,5 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/tyler-smith/go-bip32 v1.0.0
 	github.com/tyler-smith/go-bip39 v1.1.0
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
+	golang.org/x/crypto v0.0.0-20220513210258-46612604a0f9
 )

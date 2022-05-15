@@ -12,6 +12,7 @@ type IBlockchainAdapter interface {
 	DeriveAddress(log.Logger) (string, error)
 	GetBlockchainNetwork() string
 	CreateSignedTransaction(string, log.Logger) (string, error)
+	CreateSignature(string, log.Logger) (string, error)
 }
 
 // BlockchainAdapter contains common fields for

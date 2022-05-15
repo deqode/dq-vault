@@ -95,6 +95,35 @@ Returns randomly generated user UUID
 				},
 			},
 
+			// api/signature
+			&framework.Path{
+				Pattern:         "sign",
+				HelpSynopsis:    "Generate signature from raw transaction",
+				HelpDescription: "Generates signature from stored mnemonic and passphrase using deviation path",
+				Fields: map[string]*framework.FieldSchema{
+					"uuid": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "UUID of user",
+					},
+					"path": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "Deviation path to obtain keys",
+						Default:     "",
+					},
+					"coinType": &framework.FieldSchema{
+						Type:        framework.TypeInt,
+						Description: "Cointype of transaction",
+					},
+					"payload": &framework.FieldSchema{
+						Type:        framework.TypeString,
+						Description: "Raw transaction payload",
+					},
+				},
+				Callbacks: map[logical.Operation]framework.OperationFunc{
+					logical.UpdateOperation: b.pathSign,
+				},
+			},
+
 			// api/address
 			&framework.Path{
 				Pattern:         "address",

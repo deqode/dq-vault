@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
-func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
+func (b *backend) pathSign(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
 	backendLogger := b.logger
 	if err := helpers.ValidateFields(req, d); err != nil {
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
@@ -32,7 +32,7 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	// see supported coinTypes lib/bipp44coins
 	coinType := d.Get("coinType").(int)
 
-	// data in JSON required for that transaction
+	// data in string hex
 	// depends on type of transaction
 	payload := d.Get("payload").(string)
 
@@ -82,7 +82,7 @@ func (b *backend) pathSignature(ctx context.Context, req *logical.Request, d *fr
 	}
 
 	// creates signature from raw transaction payload
-	txHex, err := adapter.CreateSignedTransaction(payload, backendLogger)
+	txHex, err := adapter.CreateSignature(payload, backendLogger)
 	if err != nil {
 		logger.Log(backendLogger, config.Error, "signature:", err.Error())
 		return nil, logical.CodedError(http.StatusUnprocessableEntity, err.Error())
