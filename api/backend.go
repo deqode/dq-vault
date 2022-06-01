@@ -95,7 +95,7 @@ Returns randomly generated user UUID
 				},
 			},
 
-			// api/signature
+			// api/sign
 			&framework.Path{
 				Pattern:         "sign",
 				HelpSynopsis:    "Generate signature from raw transaction",
