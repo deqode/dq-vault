@@ -3,6 +3,7 @@ package adapter
 import (
 	"bytes"
 	"crypto/ecdsa"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,15 +11,15 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
-	log "github.com/mgutz/logxi/v1"
 	"github.com/deqode/dq-vault/config"
 	"github.com/deqode/dq-vault/lib"
 	"github.com/deqode/dq-vault/lib/adapter/baseadapter"
 	"github.com/deqode/dq-vault/logger"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	log "github.com/sirupsen/logrus"
 )
 
 // EthereumAdapter - Ethereum blockchain transaction adapter
@@ -140,6 +141,35 @@ func (e *EthereumAdapter) CreateSignedTransaction(payload string, backendLogger 
 	return txHex, nil
 }
 
+// CreateSignature creates and signs hex message from payload data + private key
+func (e *EthereumAdapter) CreateSignature(payload string, backendLogger log.Logger) (string, error) {
+	// convert hex to ECDSA private key
+	privateKey, err := crypto.HexToECDSA(e.PrivateKey)
+	if err != nil {
+		logger.Log(backendLogger, config.Error, "signature:", err.Error())
+		return "", err
+	}
+
+	// TODO: validate payload
+
+	signHash := createSignFromHex(payload)
+	signatureBytes, err := crypto.Sign(signHash.Bytes(), privateKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// This signature has recovery ID in the last byte instead of v
+	// To match the signature of the Go code with JavaScript code, the recovery ID must be replaced by v,
+	// v is one byte in size and is just the value in which both signatures differ.
+	// The recovery ID has values between 0 and 3, so v has values between 27 and 30 or 0x1b and 0x1e
+	// Hence, v = 27 + rid
+	// where rid is recovery ID
+
+	signatureBytes[64] += 27
+	return hex.EncodeToString(signatureBytes), err
+
+}
+
 // generates raw transaction from payload
 // returns raw transaction + chainId + error (if any)
 func (e *EthereumAdapter) createRawTransaction(payloadString string, backendLogger log.Logger) (*types.Transaction, *big.Int, error) {
@@ -208,4 +238,13 @@ func validatePayload(payload lib.EthereumRawTx, zeroAddress string) (bool, strin
 		return true, transactionType
 	}
 	return false, ""
+}
+
+// createSignFromHex generates hashed string to EIP-191: Signed Data Standard Hash
+// https://eips.ethereum.org/EIPS/eip-191
+func createSignFromHex(hex string) common.Hash {
+	hash := common.HexToHash(hex).Bytes()
+
+	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(hash), hash)
+	return crypto.Keccak256Hash([]byte(msg))
 }
